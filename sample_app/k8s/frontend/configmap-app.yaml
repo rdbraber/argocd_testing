@@ -14,31 +14,47 @@ data:
       <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: system-ui, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
-        header { background: #2b6cb0; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-size: 1.4rem; }
-        #user-info { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
+        header { background: #2b6cb0; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        header h1 { font-size: 1.4rem; flex-shrink: 0; }
+        #user-info { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; flex-shrink: 0; }
         #logout-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; }
         #logout-btn:hover { background: rgba(255,255,255,0.3); }
-        main { max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+        nav { display: flex; gap: 0.4rem; }
+        .nav-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.35rem 1.1rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
+        .nav-btn.active { background: white; color: #2b6cb0; font-weight: 700; border-color: white; }
+        .nav-btn:hover:not(.active) { background: rgba(255,255,255,0.25); }
+        main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
         .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1.5rem; }
+        .inner-card { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem; }
         .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
         .tab { background: none; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-size: 1rem; color: #718096; border-bottom: 2px solid transparent; margin-bottom: -2px; }
         .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; font-weight: 600; }
         .form-group { margin-bottom: 1rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
         label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.4rem; color: #4a5568; }
-        input { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; }
+        input[type=text], input[type=email], input[type=password] { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; }
         input:focus { outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 3px rgba(43,108,176,0.15); }
         .btn { padding: 0.65rem 1.4rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600; }
-        .btn-primary { background: #2b6cb0; color: white; width: 100%; margin-top: 0.5rem; }
+        .btn-primary { background: #2b6cb0; color: white; }
         .btn-primary:hover { background: #2c5282; }
         .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; }
         .btn-signup { background: #38a169; color: white; }
         .btn-signup:hover { background: #2f855a; }
         .btn-cancel { background: #e53e3e; color: white; }
         .btn-cancel:hover { background: #c53030; }
+        .btn-assign { background: #805ad5; color: white; }
+        .btn-assign:hover { background: #6b46c1; }
+        .btn-edit { background: #3182ce; color: white; }
+        .btn-edit:hover { background: #2b6cb0; }
+        .btn-del { background: #e53e3e; color: white; }
+        .btn-del:hover { background: #c53030; }
         .btn-disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
+        .btn-muted { background: #e2e8f0; color: #4a5568; }
+        .btn-muted:hover { background: #cbd5e0; }
         .error { color: #e53e3e; font-size: 0.875rem; margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: #fff5f5; border-radius: 4px; border: 1px solid #feb2b2; }
         .spinner { text-align: center; padding: 2rem; color: #718096; }
+        h2 { font-size: 1.2rem; margin-bottom: 1.25rem; color: #2d3748; }
+        h3 { font-size: 1rem; font-weight: 700; color: #2d3748; margin-bottom: 1rem; }
 
         /* Schedule accordion */
         .schedule-block { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; overflow: hidden; }
@@ -49,15 +65,16 @@ data:
         .schedule-summary { font-size: 0.8rem; color: #718096; margin-top: 0.15rem; }
         .chevron { font-size: 0.7rem; color: #a0aec0; transition: transform 0.2s; }
         .chevron.open { transform: rotate(180deg); }
-
-        /* Slot table */
         .slot-table-wrap { display: none; padding: 0 1rem 1rem; }
         .slot-table-wrap.open { display: block; }
+
+        /* Tables */
         table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.875rem; }
         th { text-align: left; padding: 0.5rem 0.75rem; color: #4a5568; font-weight: 600; border-bottom: 2px solid #e2e8f0; background: #f7fafc; }
         td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #f0f4f8; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         tr.slot-mine { background: #f0fff4; }
+
         .slot-label { font-weight: 600; color: #2d3748; }
         .slot-time { color: #718096; font-size: 0.8rem; }
         .capacity { display: inline-flex; align-items: center; gap: 0.35rem; }
@@ -67,14 +84,24 @@ data:
         .volunteers { color: #4a5568; }
         .volunteers em { color: #a0aec0; }
         .badge-you { display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 9999px; background: #c6f6d5; color: #276749; font-weight: 700; margin-left: 0.3rem; }
+        .badge-admin { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #e9d8fd; color: #553c9a; font-weight: 700; }
+        .remove-vol-btn { background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 0.85rem; font-weight: 700; padding: 0 0.15rem; line-height: 1; }
+        .remove-vol-btn:hover { color: #c53030; }
+        .assign-row td { background: #ebf8ff; border-bottom: 1px solid #bee3f8; }
+        .action-cell { text-align: right; white-space: nowrap; display: flex; gap: 0.35rem; justify-content: flex-end; }
       </style>
     </head>
     <body>
       <header>
         <h1>Volunteer Scheduler</h1>
+        <nav id="view-nav" style="display:none">
+          <button id="nav-schedule" class="nav-btn active" onclick="switchView('schedule')">Schedule</button>
+          <button id="nav-admin" class="nav-btn" onclick="switchView('admin')">Admin Panel</button>
+        </nav>
         <div id="user-info"></div>
       </header>
       <main>
+        <!-- Auth -->
         <div id="auth-section" class="card" style="display:none">
           <div class="tabs">
             <button class="tab active" onclick="showTab('login')">Login</button>
@@ -83,22 +110,59 @@ data:
           <div id="login-form">
             <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="your@email.com"></div>
             <div class="form-group"><label>Password</label><input id="login-password" type="password" placeholder="••••••••"></div>
-            <button class="btn btn-primary" onclick="doLogin()">Login</button>
+            <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="doLogin()">Login</button>
             <div id="login-error" class="error" style="display:none"></div>
           </div>
           <div id="register-form" style="display:none">
             <div class="form-group"><label>Name</label><input id="reg-name" type="text" placeholder="Your name"></div>
             <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="your@email.com"></div>
             <div class="form-group"><label>Password</label><input id="reg-password" type="password" placeholder="••••••••"></div>
-            <button class="btn btn-primary" onclick="doRegister()">Create account</button>
+            <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="doRegister()">Create account</button>
             <div id="register-error" class="error" style="display:none"></div>
           </div>
         </div>
 
+        <!-- Schedule -->
         <div id="schedule-section" style="display:none">
           <div class="card">
-            <h2 style="margin-bottom:1.25rem;color:#2d3748">Upcoming Saturdays</h2>
+            <h2>Upcoming Saturdays</h2>
             <div id="schedule-list"><div class="spinner">Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-section" style="display:none">
+          <div class="card">
+            <h2>User Management</h2>
+
+            <div class="inner-card" id="user-form-card">
+              <h3 id="form-title">Create User</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input id="uf-name" type="text" placeholder="Full name">
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input id="uf-email" type="email" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                  <label id="uf-pwd-label">Password</label>
+                  <input id="uf-password" type="password" placeholder="••••••••">
+                </div>
+                <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.6rem">
+                  <input id="uf-admin" type="checkbox" style="width:auto;cursor:pointer">
+                  <label for="uf-admin" style="margin:0;cursor:pointer">Grant admin access</label>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;margin-top:0.25rem">
+                <button class="btn btn-primary" onclick="saveUser()"><span id="form-btn-text">Create User</span></button>
+                <button id="cancel-edit-btn" class="btn btn-muted" style="display:none" onclick="cancelEdit()">Cancel</button>
+              </div>
+              <div id="user-form-error" class="error" style="display:none"></div>
+            </div>
+
+            <div id="users-table-area"><div class="spinner">Loading users...</div></div>
           </div>
         </div>
       </main>
@@ -107,6 +171,17 @@ data:
         const API = '';
         let token = localStorage.getItem('token');
         let userName = localStorage.getItem('userName');
+        let isAdmin = localStorage.getItem('isAdmin') === '1';
+        let currentView = 'schedule';
+        let allUsers = [];
+        let userMap = {};
+        let editingUserId = null;
+
+        function esc(s) {
+          return String(s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
         function showTab(tab) {
           document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
@@ -131,8 +206,10 @@ data:
               method: 'POST',
               body: JSON.stringify({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value })
             });
-            token = data.token; userName = data.name;
-            localStorage.setItem('token', token); localStorage.setItem('userName', userName);
+            token = data.token; userName = data.name; isAdmin = !!data.is_admin;
+            localStorage.setItem('token', token);
+            localStorage.setItem('userName', userName);
+            localStorage.setItem('isAdmin', isAdmin ? '1' : '0');
             renderApp();
           } catch (e) { el.textContent = e.message; el.style.display = ''; }
         }
@@ -145,17 +222,31 @@ data:
               method: 'POST',
               body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value })
             });
-            token = data.token; userName = data.name;
-            localStorage.setItem('token', token); localStorage.setItem('userName', userName);
+            token = data.token; userName = data.name; isAdmin = !!data.is_admin;
+            localStorage.setItem('token', token);
+            localStorage.setItem('userName', userName);
+            localStorage.setItem('isAdmin', isAdmin ? '1' : '0');
             renderApp();
           } catch (e) { el.textContent = e.message; el.style.display = ''; }
         }
 
         function doLogout() {
-          token = null; userName = null;
-          localStorage.removeItem('token'); localStorage.removeItem('userName');
+          token = null; userName = null; isAdmin = false; allUsers = []; userMap = {};
+          localStorage.removeItem('token'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin');
           renderApp();
         }
+
+        function switchView(view) {
+          currentView = view;
+          document.getElementById('schedule-section').style.display = view === 'schedule' ? '' : 'none';
+          document.getElementById('admin-section').style.display = view === 'admin' ? '' : 'none';
+          document.getElementById('nav-schedule').classList.toggle('active', view === 'schedule');
+          document.getElementById('nav-admin').classList.toggle('active', view === 'admin');
+          if (view === 'schedule') loadSchedules();
+          if (view === 'admin') loadAdminPanel();
+        }
+
+        // --- Schedule ---
 
         async function doSlotSignup(slotId) {
           try { await api(`/api/slots/${slotId}/signup`, { method: 'POST' }); loadSchedules(); }
@@ -170,30 +261,79 @@ data:
         function toggleSlots(scheduleId) {
           const wrap = document.getElementById('slots-' + scheduleId);
           const chevron = document.getElementById('chev-' + scheduleId);
-          const isOpen = wrap.classList.contains('open');
-          wrap.classList.toggle('open', !isOpen);
-          chevron.classList.toggle('open', !isOpen);
+          wrap.classList.toggle('open');
+          chevron.classList.toggle('open');
+        }
+
+        function toggleAssignRow(slotId) {
+          const row = document.getElementById('assign-row-' + slotId);
+          if (row) row.style.display = row.style.display === '' ? 'none' : '';
+        }
+
+        async function doAdminAssign(slotId) {
+          const sel = document.getElementById('assign-sel-' + slotId);
+          if (!sel || !sel.value) return;
+          try {
+            await api(`/api/admin/slots/${slotId}/users/${sel.value}`, { method: 'POST' });
+            loadSchedules();
+          } catch (e) { alert(e.message); }
+        }
+
+        async function doAdminRemoveFromSlot(slotId, userId) {
+          if (!confirm('Remove this volunteer from the slot?')) return;
+          try {
+            await api(`/api/admin/slots/${slotId}/users/${userId}`, { method: 'DELETE' });
+            loadSchedules();
+          } catch (e) { alert(e.message); }
+        }
+
+        async function loadAllUsers() {
+          try { allUsers = await api('/api/admin/users'); }
+          catch (e) { allUsers = []; }
         }
 
         function buildSlotTable(schedule) {
-          const rows = schedule.slots.map(slot => {
-            const pct = slot.required_count > 0 ? Math.min(100, Math.round(slot.signup_count / slot.required_count * 100)) : 100;
+          const rows = [];
+
+          schedule.slots.forEach(slot => {
+            const pct = slot.required_count > 0
+              ? Math.min(100, Math.round(slot.signup_count / slot.required_count * 100)) : 100;
             const isFull = slot.signup_count >= slot.required_count && !slot.signed_up;
             const fillClass = isFull ? 'full' : '';
-            const names = slot.volunteers.length
-              ? slot.volunteers.map(n => n === userName ? `<strong>${n}</strong><span class="badge-you">you</span>` : n).join(', ')
-              : '<em>–</em>';
-            let btn;
-            if (slot.signed_up) {
-              btn = `<button class="btn-sm btn-cancel" onclick="doSlotCancel(${slot.id})">Sign off</button>`;
-            } else if (isFull) {
-              btn = `<button class="btn-sm btn-disabled" disabled>Full</button>`;
+
+            let namesHtml;
+            if (slot.volunteers.length === 0) {
+              namesHtml = '<em>–</em>';
             } else {
-              btn = `<button class="btn-sm btn-signup" onclick="doSlotSignup(${slot.id})">Sign up</button>`;
+              namesHtml = slot.volunteers.map((name, i) => {
+                const uid = slot.volunteer_ids[i];
+                const isMe = name === userName;
+                const display = isMe
+                  ? `<strong>${esc(name)}</strong><span class="badge-you">you</span>`
+                  : esc(name);
+                if (isAdmin) {
+                  return `${display}&nbsp;<button class="remove-vol-btn" onclick="doAdminRemoveFromSlot(${slot.id},${uid})" title="Remove">×</button>`;
+                }
+                return display;
+              }).join(', ');
             }
-            return `<tr class="${slot.signed_up ? 'slot-mine' : ''}">
+
+            let actionBtn = '';
+            if (slot.signed_up) {
+              actionBtn = `<button class="btn-sm btn-cancel" onclick="doSlotCancel(${slot.id})">Sign off</button>`;
+            } else if (isFull && !isAdmin) {
+              actionBtn = `<button class="btn-sm btn-disabled" disabled>Full</button>`;
+            } else {
+              actionBtn = `<button class="btn-sm btn-signup" onclick="doSlotSignup(${slot.id})">Sign up</button>`;
+            }
+
+            const assignBtn = isAdmin
+              ? `<button class="btn-sm btn-assign" onclick="toggleAssignRow(${slot.id})">+ Assign</button>`
+              : '';
+
+            rows.push(`<tr class="${slot.signed_up ? 'slot-mine' : ''}">
               <td>
-                <div class="slot-label">${slot.label}</div>
+                <div class="slot-label">${esc(slot.label)}</div>
                 <div class="slot-time">${slot.start_time} – ${slot.end_time}</div>
               </td>
               <td>
@@ -202,32 +342,46 @@ data:
                   <span class="capacity-bar"><span class="capacity-fill ${fillClass}" style="width:${pct}%"></span></span>
                 </div>
               </td>
-              <td class="volunteers">${names}</td>
-              <td style="text-align:right">${btn}</td>
-            </tr>`;
-          }).join('');
+              <td class="volunteers">${namesHtml}</td>
+              <td><div class="action-cell">${actionBtn}${assignBtn}</div></td>
+            </tr>`);
+
+            if (isAdmin) {
+              const signedUpIds = new Set(slot.volunteer_ids);
+              const available = allUsers.filter(u => !signedUpIds.has(u.id));
+              const options = available.length
+                ? available.map(u => `<option value="${u.id}">${esc(u.name)}</option>`).join('')
+                : '<option value="" disabled>No available users</option>';
+              rows.push(`<tr id="assign-row-${slot.id}" class="assign-row" style="display:none">
+                <td colspan="4">
+                  <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;padding:0.25rem 0">
+                    <span style="font-size:0.85rem;font-weight:600;color:#553c9a">Assign to slot:</span>
+                    <select id="assign-sel-${slot.id}" style="padding:0.3rem 0.5rem;border-radius:4px;border:1px solid #cbd5e0;font-size:0.85rem">${options}</select>
+                    ${available.length ? `<button class="btn-sm btn-signup" onclick="doAdminAssign(${slot.id})">Confirm</button>` : ''}
+                    <button class="btn-sm btn-muted" onclick="toggleAssignRow(${slot.id})">Cancel</button>
+                  </div>
+                </td>
+              </tr>`);
+            }
+          });
 
           return `<table>
-            <thead><tr>
-              <th>Slot</th>
-              <th>Filled</th>
-              <th>Volunteers</th>
-              <th></th>
-            </tr></thead>
-            <tbody>${rows}</tbody>
+            <thead><tr><th>Slot</th><th>Filled</th><th>Volunteers</th><th></th></tr></thead>
+            <tbody>${rows.join('')}</tbody>
           </table>`;
         }
 
         async function loadSchedules() {
           const list = document.getElementById('schedule-list');
+          if (!list) return;
           try {
+            if (isAdmin) await loadAllUsers();
             const schedules = await api('/api/schedules');
             if (schedules.length === 0) {
               list.innerHTML = '<p style="color:#718096">No upcoming Saturdays scheduled.</p>';
               return;
             }
 
-            // Remember which accordions are open
             const openIds = new Set(
               Array.from(document.querySelectorAll('.slot-table-wrap.open'))
                    .map(el => el.id.replace('slots-', ''))
@@ -257,22 +411,146 @@ data:
             }).join('');
           } catch (e) {
             if (e.message.includes('401') || e.message.includes('token')) { doLogout(); return; }
-            list.innerHTML = `<div class="error">${e.message}</div>`;
+            list.innerHTML = `<div class="error">${esc(e.message)}</div>`;
           }
         }
+
+        // --- Admin Panel ---
+
+        function cancelEdit() {
+          editingUserId = null;
+          document.getElementById('form-title').textContent = 'Create User';
+          document.getElementById('form-btn-text').textContent = 'Create User';
+          document.getElementById('cancel-edit-btn').style.display = 'none';
+          document.getElementById('uf-pwd-label').textContent = 'Password';
+          document.getElementById('uf-name').value = '';
+          document.getElementById('uf-email').value = '';
+          document.getElementById('uf-password').value = '';
+          document.getElementById('uf-admin').checked = false;
+          document.getElementById('user-form-error').style.display = 'none';
+        }
+
+        function editUser(userId) {
+          const u = userMap[userId];
+          if (!u) return;
+          editingUserId = userId;
+          document.getElementById('form-title').textContent = 'Edit User';
+          document.getElementById('form-btn-text').textContent = 'Update User';
+          document.getElementById('cancel-edit-btn').style.display = '';
+          document.getElementById('uf-pwd-label').textContent = 'Password (leave blank to keep)';
+          document.getElementById('uf-name').value = u.name;
+          document.getElementById('uf-email').value = u.email;
+          document.getElementById('uf-password').value = '';
+          document.getElementById('uf-admin').checked = u.is_admin;
+          document.getElementById('user-form-error').style.display = 'none';
+          document.getElementById('user-form-card').scrollIntoView({ behavior: 'smooth' });
+          document.getElementById('uf-name').focus();
+        }
+
+        async function saveUser() {
+          const errEl = document.getElementById('user-form-error');
+          errEl.style.display = 'none';
+          const body = {
+            name: document.getElementById('uf-name').value.trim(),
+            email: document.getElementById('uf-email').value.trim(),
+            password: document.getElementById('uf-password').value,
+            is_admin: document.getElementById('uf-admin').checked,
+          };
+          if (!body.name || !body.email) {
+            errEl.textContent = 'Name and email are required.';
+            errEl.style.display = '';
+            return;
+          }
+          if (!editingUserId && !body.password) {
+            errEl.textContent = 'Password is required for new users.';
+            errEl.style.display = '';
+            return;
+          }
+          try {
+            if (editingUserId) {
+              await api(`/api/admin/users/${editingUserId}`, { method: 'PUT', body: JSON.stringify(body) });
+            } else {
+              await api('/api/admin/users', { method: 'POST', body: JSON.stringify(body) });
+            }
+            cancelEdit();
+            loadAdminPanel();
+          } catch (e) {
+            errEl.textContent = e.message;
+            errEl.style.display = '';
+          }
+        }
+
+        async function deleteUser(userId) {
+          const u = userMap[userId];
+          if (!confirm(`Delete user "${u ? u.name : 'this user'}"? Their slot sign-ups will also be removed.`)) return;
+          try {
+            await api(`/api/admin/users/${userId}`, { method: 'DELETE' });
+            if (editingUserId === userId) cancelEdit();
+            loadAdminPanel();
+          } catch (e) { alert(e.message); }
+        }
+
+        async function loadAdminPanel() {
+          const area = document.getElementById('users-table-area');
+          if (!area) return;
+          try {
+            const users = await api('/api/admin/users');
+            allUsers = users;
+            userMap = {};
+            users.forEach(u => userMap[u.id] = u);
+
+            if (users.length === 0) {
+              area.innerHTML = '<p style="color:#718096">No users yet.</p>';
+              return;
+            }
+
+            const rows = users.map(u => `<tr>
+              <td style="font-weight:500">${esc(u.name)}</td>
+              <td style="color:#718096;font-size:0.875rem">${esc(u.email)}</td>
+              <td>${u.is_admin
+                ? '<span class="badge-admin">Admin</span>'
+                : '<span style="color:#a0aec0;font-size:0.8rem">Volunteer</span>'}</td>
+              <td style="text-align:right">
+                <button class="btn-sm btn-edit" onclick="editUser(${u.id})">Edit</button>
+                <button class="btn-sm btn-del" onclick="deleteUser(${u.id})" style="margin-left:0.4rem">Delete</button>
+              </td>
+            </tr>`).join('');
+
+            area.innerHTML = `<table>
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>`;
+          } catch (e) {
+            area.innerHTML = `<div class="error">${esc(e.message)}</div>`;
+          }
+        }
+
+        // --- App shell ---
 
         function renderApp() {
           const authSection = document.getElementById('auth-section');
           const scheduleSection = document.getElementById('schedule-section');
+          const adminSection = document.getElementById('admin-section');
+          const viewNav = document.getElementById('view-nav');
           const userInfo = document.getElementById('user-info');
+
           if (token && userName) {
             authSection.style.display = 'none';
-            scheduleSection.style.display = '';
-            userInfo.innerHTML = `<span>Hello, ${userName}</span><button id="logout-btn" onclick="doLogout()">Logout</button>`;
-            loadSchedules();
+            userInfo.innerHTML = `<span>Hello, ${esc(userName)}</span><button id="logout-btn" onclick="doLogout()">Logout</button>`;
+            if (isAdmin) {
+              viewNav.style.display = '';
+              switchView(currentView);
+            } else {
+              viewNav.style.display = 'none';
+              scheduleSection.style.display = '';
+              adminSection.style.display = 'none';
+              loadSchedules();
+            }
           } else {
             authSection.style.display = '';
             scheduleSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            viewNav.style.display = 'none';
             userInfo.innerHTML = '';
           }
         }
