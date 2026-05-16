@@ -19,7 +19,7 @@ spec:
         command: ["sh", "-c", "until pg_isready -h postgres -U scheduler; do sleep 2; done"]
       containers:
       - name: backend
-        image: ghcr.io/rdbraber/volunteer-backend:latest
+        image: 192.168.123.248:5000/volunteer-backend:latest
         ports:
         - containerPort: 8000
         env:
