@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: frontend
+      annotations:
+        checksum/config: "65229c6d"
     spec:
       containers:
       - name: frontend
