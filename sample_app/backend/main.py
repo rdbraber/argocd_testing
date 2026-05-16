@@ -23,6 +23,13 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 security = HTTPBearer()
 
+SLOT_TEMPLATES = [
+    {"start_time": "09:00", "end_time": "10:30", "required_count": 1, "label": "Driver"},
+    {"start_time": "10:00", "end_time": "13:00", "required_count": 2, "label": "Morning shift"},
+    {"start_time": "13:00", "end_time": "16:00", "required_count": 2, "label": "Afternoon shift"},
+    {"start_time": "15:30", "end_time": "17:00", "required_count": 2, "label": "Driver & Helper"},
+]
+
 
 # --- Models ---
 
@@ -33,25 +40,37 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    signups = relationship("Signup", back_populates="user")
+    slot_signups = relationship("SlotSignup", back_populates="user")
 
 
 class Schedule(Base):
     __tablename__ = "schedules"
     id = Column(Integer, primary_key=True)
     date = Column(Date, unique=True, nullable=False)
-    signups = relationship("Signup", back_populates="schedule")
+    slots = relationship("TimeSlot", back_populates="schedule", order_by="TimeSlot.start_time")
 
 
-class Signup(Base):
-    __tablename__ = "signups"
+class TimeSlot(Base):
+    __tablename__ = "time_slots"
+    id = Column(Integer, primary_key=True)
+    schedule_id = Column(Integer, ForeignKey("schedules.id"), nullable=False)
+    start_time = Column(String(5), nullable=False)
+    end_time = Column(String(5), nullable=False)
+    required_count = Column(Integer, nullable=False)
+    label = Column(String(100), nullable=False)
+    schedule = relationship("Schedule", back_populates="slots")
+    signups = relationship("SlotSignup", back_populates="slot")
+
+
+class SlotSignup(Base):
+    __tablename__ = "slot_signups"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    schedule_id = Column(Integer, ForeignKey("schedules.id"), nullable=False)
+    slot_id = Column(Integer, ForeignKey("time_slots.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    user = relationship("User", back_populates="signups")
-    schedule = relationship("Schedule", back_populates="signups")
-    __table_args__ = (UniqueConstraint("user_id", "schedule_id"),)
+    user = relationship("User", back_populates="slot_signups")
+    slot = relationship("TimeSlot", back_populates="signups")
+    __table_args__ = (UniqueConstraint("user_id", "slot_id"),)
 
 
 # --- Schemas ---
@@ -67,12 +86,25 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class ScheduleOut(BaseModel):
+class SlotOut(BaseModel):
     id: int
-    date: date
+    start_time: str
+    end_time: str
+    label: str
+    required_count: int
     signup_count: int
     signed_up: bool
     volunteers: List[str]
+    full: bool
+
+    class Config:
+        from_attributes = True
+
+
+class ScheduleOut(BaseModel):
+    id: int
+    date: date
+    slots: List[SlotOut]
 
     class Config:
         from_attributes = True
@@ -117,13 +149,19 @@ def get_current_user(
 
 
 def seed_schedules(db: Session):
-    if db.query(Schedule).count() > 0:
-        return
-    today = date.today()
-    days_ahead = (5 - today.weekday()) % 7 or 7
-    next_saturday = today + timedelta(days=days_ahead)
-    for i in range(16):
-        db.add(Schedule(date=next_saturday + timedelta(weeks=i)))
+    if db.query(Schedule).count() == 0:
+        today = date.today()
+        days_ahead = (5 - today.weekday()) % 7 or 7
+        next_saturday = today + timedelta(days=days_ahead)
+        for i in range(16):
+            db.add(Schedule(date=next_saturday + timedelta(weeks=i)))
+        db.commit()
+
+    # Add time slots to any schedule that doesn't have them yet
+    for schedule in db.query(Schedule).all():
+        if not schedule.slots:
+            for tmpl in SLOT_TEMPLATES:
+                db.add(TimeSlot(schedule_id=schedule.id, **tmpl))
     db.commit()
 
 
@@ -178,36 +216,49 @@ def list_schedules(current_user: User = Depends(get_current_user), db: Session =
                  .all())
     result = []
     for s in schedules:
-        signed_up = any(su.user_id == current_user.id for su in s.signups)
-        result.append(ScheduleOut(id=s.id, date=s.date,
-                                  signup_count=len(s.signups), signed_up=signed_up,
-                                  volunteers=[su.user.name for su in s.signups]))
+        slots = []
+        for slot in s.slots:
+            signed_up = any(su.user_id == current_user.id for su in slot.signups)
+            slots.append(SlotOut(
+                id=slot.id,
+                start_time=slot.start_time,
+                end_time=slot.end_time,
+                label=slot.label,
+                required_count=slot.required_count,
+                signup_count=len(slot.signups),
+                signed_up=signed_up,
+                volunteers=[su.user.name for su in slot.signups],
+                full=len(slot.signups) >= slot.required_count and not signed_up,
+            ))
+        result.append(ScheduleOut(id=s.id, date=s.date, slots=slots))
     return result
 
 
-@app.post("/api/schedules/{schedule_id}/signup", status_code=201)
-def signup(schedule_id: int, current_user: User = Depends(get_current_user),
+@app.post("/api/slots/{slot_id}/signup", status_code=201)
+def signup(slot_id: int, current_user: User = Depends(get_current_user),
            db: Session = Depends(get_db)):
-    schedule = db.query(Schedule).filter(Schedule.id == schedule_id).first()
-    if not schedule:
-        raise HTTPException(status_code=404, detail="Schedule not found")
-    if schedule.date < date.today():
+    slot = db.query(TimeSlot).filter(TimeSlot.id == slot_id).first()
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    if slot.schedule.date < date.today():
         raise HTTPException(status_code=400, detail="Cannot sign up for past dates")
-    if db.query(Signup).filter(Signup.user_id == current_user.id,
-                                Signup.schedule_id == schedule_id).first():
-        raise HTTPException(status_code=400, detail="Already signed up")
-    db.add(Signup(user_id=current_user.id, schedule_id=schedule_id))
+    if len(slot.signups) >= slot.required_count:
+        raise HTTPException(status_code=400, detail="This slot is already full")
+    if db.query(SlotSignup).filter(SlotSignup.user_id == current_user.id,
+                                    SlotSignup.slot_id == slot_id).first():
+        raise HTTPException(status_code=400, detail="Already signed up for this slot")
+    db.add(SlotSignup(user_id=current_user.id, slot_id=slot_id))
     db.commit()
     return {"message": "Signed up successfully"}
 
 
-@app.delete("/api/schedules/{schedule_id}/signup")
-def cancel_signup(schedule_id: int, current_user: User = Depends(get_current_user),
+@app.delete("/api/slots/{slot_id}/signup")
+def cancel_signup(slot_id: int, current_user: User = Depends(get_current_user),
                   db: Session = Depends(get_db)):
-    signup = db.query(Signup).filter(Signup.user_id == current_user.id,
-                                      Signup.schedule_id == schedule_id).first()
-    if not signup:
-        raise HTTPException(status_code=404, detail="Not signed up for this date")
-    db.delete(signup)
+    su = db.query(SlotSignup).filter(SlotSignup.user_id == current_user.id,
+                                      SlotSignup.slot_id == slot_id).first()
+    if not su:
+        raise HTTPException(status_code=404, detail="Not signed up for this slot")
+    db.delete(su)
     db.commit()
     return {"message": "Cancelled successfully"}
