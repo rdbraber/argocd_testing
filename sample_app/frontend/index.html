@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Scheduler</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+    header { background: #2b6cb0; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.4rem; }
+    #user-info { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
+    #logout-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; }
+    #logout-btn:hover { background: rgba(255,255,255,0.3); }
+    main { max-width: 700px; margin: 2rem auto; padding: 0 1rem; }
+    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1.5rem; }
+    .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
+    .tab { background: none; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-size: 1rem; color: #718096; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; font-weight: 600; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.4rem; color: #4a5568; }
+    input { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; }
+    input:focus { outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 3px rgba(43,108,176,0.15); }
+    .btn { padding: 0.65rem 1.4rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600; }
+    .btn-primary { background: #2b6cb0; color: white; width: 100%; margin-top: 0.5rem; }
+    .btn-primary:hover { background: #2c5282; }
+    .btn-sm { padding: 0.35rem 0.9rem; font-size: 0.85rem; }
+    .btn-signup { background: #38a169; color: white; }
+    .btn-signup:hover { background: #2f855a; }
+    .btn-cancel { background: #e53e3e; color: white; }
+    .btn-cancel:hover { background: #c53030; }
+    .error { color: #e53e3e; font-size: 0.875rem; margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: #fff5f5; border-radius: 4px; border: 1px solid #feb2b2; }
+    h2 { font-size: 1.2rem; margin-bottom: 1.25rem; color: #2d3748; }
+    .schedule-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .schedule-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #f7fafc; }
+    .schedule-item.signed-up { border-color: #9ae6b4; background: #f0fff4; }
+    .schedule-date { font-weight: 600; font-size: 1rem; }
+    .schedule-meta { font-size: 0.8rem; color: #718096; margin-top: 0.2rem; }
+    .badge { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; font-weight: 600; }
+    .badge-green { background: #c6f6d5; color: #276749; }
+    .spinner { text-align: center; padding: 2rem; color: #718096; }
+    .time-info { font-size: 0.8rem; color: #718096; margin-bottom: 1.25rem; background: #ebf8ff; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid #2b6cb0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Volunteer Scheduler</h1>
+    <div id="user-info"></div>
+  </header>
+  <main>
+    <div id="auth-section" class="card" style="display:none">
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('login')">Login</button>
+        <button class="tab" onclick="showTab('register')">Register</button>
+      </div>
+      <div id="login-form">
+        <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Password</label><input id="login-password" type="password" placeholder="••••••••"></div>
+        <button class="btn btn-primary" onclick="doLogin()">Login</button>
+        <div id="login-error" class="error" style="display:none"></div>
+      </div>
+      <div id="register-form" style="display:none">
+        <div class="form-group"><label>Name</label><input id="reg-name" type="text" placeholder="Your name"></div>
+        <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Password</label><input id="reg-password" type="password" placeholder="••••••••"></div>
+        <button class="btn btn-primary" onclick="doRegister()">Create account</button>
+        <div id="register-error" class="error" style="display:none"></div>
+      </div>
+    </div>
+
+    <div id="schedule-section" style="display:none">
+      <div class="card">
+        <h2>Upcoming Saturdays</h2>
+        <div class="time-info">Volunteer work runs every Saturday from <strong>10:00 – 15:00</strong></div>
+        <div id="schedule-list" class="schedule-list"><div class="spinner">Loading...</div></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API = '';
+    let token = localStorage.getItem('token');
+    let userName = localStorage.getItem('userName');
+
+    function showTab(tab) {
+      document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+      document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
+    }
+
+    async function api(path, opts = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(API + path, { headers, ...opts });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || 'Request failed');
+      return data;
+    }
+
+    async function doLogin() {
+      const el = document.getElementById('login-error');
+      el.style.display = 'none';
+      try {
+        const data = await api('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email: document.getElementById('login-email').value, password: document.getElementById('login-password').value })
+        });
+        token = data.token; userName = data.name;
+        localStorage.setItem('token', token); localStorage.setItem('userName', userName);
+        renderApp();
+      } catch (e) { el.textContent = e.message; el.style.display = ''; }
+    }
+
+    async function doRegister() {
+      const el = document.getElementById('register-error');
+      el.style.display = 'none';
+      try {
+        const data = await api('/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ name: document.getElementById('reg-name').value, email: document.getElementById('reg-email').value, password: document.getElementById('reg-password').value })
+        });
+        token = data.token; userName = data.name;
+        localStorage.setItem('token', token); localStorage.setItem('userName', userName);
+        renderApp();
+      } catch (e) { el.textContent = e.message; el.style.display = ''; }
+    }
+
+    function doLogout() {
+      token = null; userName = null;
+      localStorage.removeItem('token'); localStorage.removeItem('userName');
+      renderApp();
+    }
+
+    async function doSignup(id) {
+      try { await api(`/api/schedules/${id}/signup`, { method: 'POST' }); loadSchedules(); }
+      catch (e) { alert(e.message); }
+    }
+
+    async function doCancel(id) {
+      try { await api(`/api/schedules/${id}/signup`, { method: 'DELETE' }); loadSchedules(); }
+      catch (e) { alert(e.message); }
+    }
+
+    async function loadSchedules() {
+      const list = document.getElementById('schedule-list');
+      try {
+        const schedules = await api('/api/schedules');
+        if (schedules.length === 0) { list.innerHTML = '<p style="color:#718096">No upcoming Saturdays scheduled.</p>'; return; }
+        list.innerHTML = schedules.map(s => {
+          const d = new Date(s.date + 'T00:00:00');
+          const label = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          const signed = s.signed_up;
+          return `<div class="schedule-item ${signed ? 'signed-up' : ''}">
+            <div>
+              <div class="schedule-date">${label}</div>
+              <div class="schedule-meta">${s.signup_count} volunteer${s.signup_count !== 1 ? 's' : ''} signed up
+                ${signed ? '<span class="badge badge-green" style="margin-left:0.5rem">You\'re in!</span>' : ''}
+              </div>
+            </div>
+            ${signed
+              ? `<button class="btn btn-sm btn-cancel" onclick="doCancel(${s.id})">Cancel</button>`
+              : `<button class="btn btn-sm btn-signup" onclick="doSignup(${s.id})">Sign up</button>`}
+          </div>`;
+        }).join('');
+      } catch (e) {
+        if (e.message.includes('401') || e.message.includes('token')) { doLogout(); return; }
+        list.innerHTML = `<div class="error">${e.message}</div>`;
+      }
+    }
+
+    function renderApp() {
+      const authSection = document.getElementById('auth-section');
+      const scheduleSection = document.getElementById('schedule-section');
+      const userInfo = document.getElementById('user-info');
+      if (token && userName) {
+        authSection.style.display = 'none';
+        scheduleSection.style.display = '';
+        userInfo.innerHTML = `<span>Hello, ${userName}</span><button id="logout-btn" onclick="doLogout()">Logout</button>`;
+        loadSchedules();
+      } else {
+        authSection.style.display = '';
+        scheduleSection.style.display = 'none';
+        userInfo.innerHTML = '';
+      }
+    }
+
+    renderApp();
+  </script>
+</body>
+</html>
