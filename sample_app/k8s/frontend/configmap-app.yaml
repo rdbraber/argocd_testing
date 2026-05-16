@@ -6,7 +6,7 @@ metadata:
 data:
   index.html: |
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="nl">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,19 +27,28 @@ data:
         .nav-btn.active { background: white; color: #ee7402; font-weight: 700; border-color: white; }
         .nav-btn:hover:not(.active) { background: rgba(255,255,255,0.25); }
 
-        main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        main { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
         .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1.5rem; }
         .inner-card { background: #fdf7f2; border: 1px solid #fbd8b8; border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem; }
 
+        /* Sub-tabs inside admin */
+        .sub-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
+        .sub-tab { background: none; border: none; padding: 0.65rem 1.25rem; cursor: pointer; font-size: 0.95rem; color: #718096; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .sub-tab.active { color: #ee7402; border-bottom-color: #ee7402; font-weight: 600; }
+
+        /* Auth tabs */
         .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
         .tab { background: none; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-size: 1rem; color: #718096; border-bottom: 2px solid transparent; margin-bottom: -2px; }
         .tab.active { color: #ee7402; border-bottom-color: #ee7402; font-weight: 600; }
 
         .form-group { margin-bottom: 1rem; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 1rem; }
         label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.4rem; color: #4a5568; }
-        input[type=text], input[type=email], input[type=password] { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; }
-        input:focus { outline: none; border-color: #ee7402; box-shadow: 0 0 0 3px rgba(238,115,12,0.15); }
+        input[type=text], input[type=email], input[type=password], input[type=date], input[type=time], input[type=number], select {
+          width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; background: white;
+        }
+        input:focus, select:focus { outline: none; border-color: #ee7402; box-shadow: 0 0 0 3px rgba(238,115,12,0.15); }
 
         .btn { padding: 0.65rem 1.4rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600; }
         .btn-primary { background: #ee7402; color: white; }
@@ -58,6 +67,8 @@ data:
         .btn-disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
         .btn-muted { background: #e2e8f0; color: #4a5568; }
         .btn-muted:hover { background: #cbd5e0; }
+        .btn-add { background: #3182ce; color: white; }
+        .btn-add:hover { background: #2b6cb0; }
 
         .error { color: #e53e3e; font-size: 0.875rem; margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: #fff5f5; border-radius: 4px; border: 1px solid #feb2b2; }
         .spinner { text-align: center; padding: 2rem; color: #718096; }
@@ -70,6 +81,7 @@ data:
         .schedule-header:hover { background: #faeade; }
         .schedule-header.has-signup { background: #f0fff4; border-left: 3px solid #38a169; }
         .schedule-date { font-weight: 600; font-size: 1rem; color: #2d3748; }
+        .schedule-store { font-size: 0.8rem; color: #718096; margin-top: 0.1rem; }
         .schedule-summary { font-size: 0.8rem; color: #718096; margin-top: 0.15rem; }
         .chevron { font-size: 0.7rem; color: #a0aec0; transition: transform 0.2s; }
         .chevron.open { transform: rotate(180deg); }
@@ -95,8 +107,26 @@ data:
         .badge-admin { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #fde8c8; color: #9a3c07; font-weight: 700; }
         .remove-vol-btn { background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 0.85rem; font-weight: 700; padding: 0 0.15rem; line-height: 1; }
         .remove-vol-btn:hover { color: #c53030; }
-        .assign-row td { background: #fff8f0; border-bottom: 1px solid #fbd8b8; }
+        .assign-row td, .edit-slot-row td { background: #fff8f0; border-bottom: 1px solid #fbd8b8; }
         .action-cell { text-align: right; white-space: nowrap; display: flex; gap: 0.35rem; justify-content: flex-end; }
+
+        /* Date management */
+        .date-block { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+        .date-block-header { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background: #fdf7f2; }
+        .date-block-info { flex: 1; }
+        .date-block-title { font-weight: 600; color: #2d3748; }
+        .date-block-sub { font-size: 0.8rem; color: #718096; margin-top: 0.1rem; }
+        .date-block-body { padding: 0 1.25rem 1.25rem; }
+
+        /* Store info card */
+        .store-detail { font-size: 0.85rem; color: #4a5568; }
+        .store-detail strong { color: #2d3748; }
+
+        /* Inline edit form for slots */
+        .slot-edit-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 0.5rem; align-items: end; }
+
+        /* Day name badge */
+        .day-badge { display: inline-block; margin-left: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #ee7402; background: #fde8c8; padding: 0.15rem 0.5rem; border-radius: 4px; }
       </style>
     </head>
     <body>
@@ -162,7 +192,7 @@ data:
         <!-- Schedule -->
         <div id="schedule-section" style="display:none">
           <div class="card">
-            <h2>Komende zaterdagen</h2>
+            <h2>Komende data</h2>
             <div id="schedule-list"><div class="spinner">Laden...</div></div>
           </div>
         </div>
@@ -170,36 +200,108 @@ data:
         <!-- Admin Panel -->
         <div id="admin-section" style="display:none">
           <div class="card">
-            <h2>Vrijwilligers beheren</h2>
-
-            <div class="inner-card" id="user-form-card">
-              <h3 id="form-title">Vrijwilliger toevoegen</h3>
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Naam</label>
-                  <input id="uf-name" type="text" placeholder="Volledige naam">
-                </div>
-                <div class="form-group">
-                  <label>E-mailadres</label>
-                  <input id="uf-email" type="email" placeholder="email@voorbeeld.nl">
-                </div>
-                <div class="form-group">
-                  <label id="uf-pwd-label">Wachtwoord</label>
-                  <input id="uf-password" type="password" placeholder="••••••••">
-                </div>
-                <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.6rem">
-                  <input id="uf-admin" type="checkbox" style="width:auto;cursor:pointer">
-                  <label for="uf-admin" style="margin:0;cursor:pointer">Beheerder toegang</label>
-                </div>
-              </div>
-              <div style="display:flex;gap:0.75rem;margin-top:0.25rem">
-                <button class="btn btn-primary" onclick="saveUser()"><span id="form-btn-text">Toevoegen</span></button>
-                <button id="cancel-edit-btn" class="btn btn-muted" style="display:none" onclick="cancelEdit()">Annuleren</button>
-              </div>
-              <div id="user-form-error" class="error" style="display:none"></div>
+            <h2>Beheer</h2>
+            <div class="sub-tabs">
+              <button class="sub-tab active" id="stab-users" onclick="switchAdminTab('users')">Vrijwilligers</button>
+              <button class="sub-tab" id="stab-stores" onclick="switchAdminTab('stores')">Winkels</button>
+              <button class="sub-tab" id="stab-dates" onclick="switchAdminTab('dates')">Data</button>
             </div>
 
-            <div id="users-table-area"><div class="spinner">Laden...</div></div>
+            <!-- Users -->
+            <div id="admin-users-section">
+              <div class="inner-card" id="user-form-card">
+                <h3 id="form-title">Vrijwilliger toevoegen</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Naam</label>
+                    <input id="uf-name" type="text" placeholder="Volledige naam">
+                  </div>
+                  <div class="form-group">
+                    <label>E-mailadres</label>
+                    <input id="uf-email" type="email" placeholder="email@voorbeeld.nl">
+                  </div>
+                  <div class="form-group">
+                    <label id="uf-pwd-label">Wachtwoord</label>
+                    <input id="uf-password" type="password" placeholder="••••••••">
+                  </div>
+                  <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.6rem">
+                    <input id="uf-admin" type="checkbox" style="width:auto;cursor:pointer">
+                    <label for="uf-admin" style="margin:0;cursor:pointer">Beheerder toegang</label>
+                  </div>
+                </div>
+                <div style="display:flex;gap:0.75rem;margin-top:0.25rem">
+                  <button class="btn btn-primary" onclick="saveUser()"><span id="form-btn-text">Toevoegen</span></button>
+                  <button id="cancel-edit-btn" class="btn btn-muted" style="display:none" onclick="cancelEdit()">Annuleren</button>
+                </div>
+                <div id="user-form-error" class="error" style="display:none"></div>
+              </div>
+              <div id="users-table-area"><div class="spinner">Laden...</div></div>
+            </div>
+
+            <!-- Stores -->
+            <div id="admin-stores-section" style="display:none">
+              <div class="inner-card" id="store-form-card">
+                <h3 id="store-form-title">Winkel toevoegen</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Naam <span style="color:#e53e3e">*</span></label>
+                    <input id="sf-name" type="text" placeholder="Naam van de winkel">
+                  </div>
+                  <div class="form-group">
+                    <label>Straat <span style="color:#e53e3e">*</span></label>
+                    <input id="sf-street" type="text" placeholder="Straatnaam 1">
+                  </div>
+                  <div class="form-group">
+                    <label>Postcode <span style="color:#e53e3e">*</span></label>
+                    <input id="sf-postcode" type="text" placeholder="1234 AB">
+                  </div>
+                  <div class="form-group">
+                    <label>Plaats <span style="color:#e53e3e">*</span></label>
+                    <input id="sf-city" type="text" placeholder="Plaatsnaam">
+                  </div>
+                  <div class="form-group">
+                    <label>Contactpersoon</label>
+                    <input id="sf-contact" type="text" placeholder="Naam contactpersoon">
+                  </div>
+                  <div class="form-group">
+                    <label>Telefoonnummer</label>
+                    <input id="sf-phone" type="text" placeholder="06-12345678">
+                  </div>
+                </div>
+                <div style="display:flex;gap:0.75rem;margin-top:0.25rem">
+                  <button class="btn btn-primary" onclick="saveStore()"><span id="store-form-btn-text">Toevoegen</span></button>
+                  <button id="cancel-store-btn" class="btn btn-muted" style="display:none" onclick="cancelStoreEdit()">Annuleren</button>
+                </div>
+                <div id="store-form-error" class="error" style="display:none"></div>
+              </div>
+              <div id="stores-table-area"><div class="spinner">Laden...</div></div>
+            </div>
+
+            <!-- Dates -->
+            <div id="admin-dates-section" style="display:none">
+              <div class="inner-card">
+                <h3>Datum toevoegen</h3>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Datum <span style="color:#e53e3e">*</span></label>
+                    <div style="display:flex;align-items:center;gap:0.5rem">
+                      <input id="df-date" type="date" style="flex:1" oninput="updateDayName()">
+                      <span id="df-dayname" class="day-badge" style="display:none"></span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Winkel <span style="color:#e53e3e">*</span></label>
+                    <select id="df-store">
+                      <option value="">— selecteer winkel —</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveDate()">Datum toevoegen</button>
+                <div id="date-form-error" class="error" style="display:none"></div>
+              </div>
+              <div id="dates-list-area"><div class="spinner">Laden...</div></div>
+            </div>
+
           </div>
         </div>
       </main>
@@ -210,14 +312,26 @@ data:
         let userName = localStorage.getItem('userName');
         let isAdmin = localStorage.getItem('isAdmin') === '1';
         let currentView = 'schedule';
+        let adminTab = 'users';
         let allUsers = [];
         let userMap = {};
         let editingUserId = null;
+        let allStores = [];
+        let storeMap = {};
+        let editingStoreId = null;
+
+        const DAYS = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
 
         function esc(s) {
           return String(s)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function fmtDate(dateStr) {
+          const d = new Date(dateStr + 'T00:00:00');
+          const label = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          return label.charAt(0).toUpperCase() + label.slice(1);
         }
 
         function showTab(tab) {
@@ -268,7 +382,7 @@ data:
         }
 
         function doLogout() {
-          token = null; userName = null; isAdmin = false; allUsers = []; userMap = {};
+          token = null; userName = null; isAdmin = false; allUsers = []; userMap = {}; allStores = []; storeMap = {};
           localStorage.removeItem('token'); localStorage.removeItem('userName'); localStorage.removeItem('isAdmin');
           renderApp();
         }
@@ -280,8 +394,21 @@ data:
           document.getElementById('nav-schedule').classList.toggle('active', view === 'schedule');
           document.getElementById('nav-admin').classList.toggle('active', view === 'admin');
           if (view === 'schedule') loadSchedules();
-          if (view === 'admin') loadAdminPanel();
+          if (view === 'admin') switchAdminTab(adminTab);
         }
+
+        function switchAdminTab(tab) {
+          adminTab = tab;
+          ['users','stores','dates'].forEach(t => {
+            document.getElementById('admin-' + t + '-section').style.display = t === tab ? '' : 'none';
+            document.getElementById('stab-' + t).classList.toggle('active', t === tab);
+          });
+          if (tab === 'users') loadAdminPanel();
+          if (tab === 'stores') loadStores();
+          if (tab === 'dates') loadDates();
+        }
+
+        // --- Schedule view ---
 
         async function doSlotSignup(slotId) {
           try { await api(`/api/slots/${slotId}/signup`, { method: 'POST' }); loadSchedules(); }
@@ -329,10 +456,8 @@ data:
 
         function buildSlotTable(schedule) {
           const rows = [];
-
           schedule.slots.forEach(slot => {
-            const pct = slot.required_count > 0
-              ? Math.min(100, Math.round(slot.signup_count / slot.required_count * 100)) : 100;
+            const pct = slot.required_count > 0 ? Math.min(100, Math.round(slot.signup_count / slot.required_count * 100)) : 100;
             const isFull = slot.signup_count >= slot.required_count && !slot.signed_up;
             const fillClass = isFull ? 'full' : '';
 
@@ -346,10 +471,9 @@ data:
                 const display = isMe
                   ? `<strong>${esc(name)}</strong><span class="badge-you">jij</span>`
                   : esc(name);
-                if (isAdmin) {
-                  return `${display}&nbsp;<button class="remove-vol-btn" onclick="doAdminRemoveFromSlot(${slot.id},${uid})" title="Verwijderen">×</button>`;
-                }
-                return display;
+                return isAdmin
+                  ? `${display}&nbsp;<button class="remove-vol-btn" onclick="doAdminRemoveFromSlot(${slot.id},${uid})" title="Verwijderen">×</button>`
+                  : display;
               }).join(', ');
             }
 
@@ -413,7 +537,7 @@ data:
             if (isAdmin) await loadAllUsers();
             const schedules = await api('/api/schedules');
             if (schedules.length === 0) {
-              list.innerHTML = '<p style="color:#718096">Geen komende zaterdagen gepland.</p>';
+              list.innerHTML = '<p style="color:#718096">Geen komende data gepland.</p>';
               return;
             }
 
@@ -423,18 +547,20 @@ data:
             );
 
             list.innerHTML = schedules.map(s => {
-              const d = new Date(s.date + 'T00:00:00');
-              const label = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
               const mySlots = s.slots.filter(sl => sl.signed_up).length;
               const totalFilled = s.slots.reduce((a, sl) => a + sl.signup_count, 0);
               const totalNeeded = s.slots.reduce((a, sl) => a + sl.required_count, 0);
               const hasMine = mySlots > 0;
               const isOpen = openIds.has(String(s.id));
+              const storeLine = s.store
+                ? `<div class="schedule-store">${esc(s.store.name)} &mdash; ${esc(s.store.street)}, ${esc(s.store.city)}</div>`
+                : '';
 
               return `<div class="schedule-block">
                 <div class="schedule-header ${hasMine ? 'has-signup' : ''}" onclick="toggleSlots(${s.id})">
                   <div>
-                    <div class="schedule-date">${label.charAt(0).toUpperCase() + label.slice(1)}</div>
+                    <div class="schedule-date">${fmtDate(s.date)}</div>
+                    ${storeLine}
                     <div class="schedule-summary">${totalFilled} van ${totalNeeded} plaatsen bezet${hasMine ? ' &mdash; <strong style="color:#276749">jij bent aangemeld</strong>' : ''}</div>
                   </div>
                   <span class="chevron ${isOpen ? 'open' : ''}" id="chev-${s.id}">&#9660;</span>
@@ -449,6 +575,8 @@ data:
             list.innerHTML = `<div class="error">${esc(e.message)}</div>`;
           }
         }
+
+        // --- Admin: Users ---
 
         function cancelEdit() {
           editingUserId = null;
@@ -489,16 +617,8 @@ data:
             password: document.getElementById('uf-password').value,
             is_admin: document.getElementById('uf-admin').checked,
           };
-          if (!body.name || !body.email) {
-            errEl.textContent = 'Naam en e-mailadres zijn verplicht.';
-            errEl.style.display = '';
-            return;
-          }
-          if (!editingUserId && !body.password) {
-            errEl.textContent = 'Wachtwoord is verplicht voor nieuwe gebruikers.';
-            errEl.style.display = '';
-            return;
-          }
+          if (!body.name || !body.email) { errEl.textContent = 'Naam en e-mailadres zijn verplicht.'; errEl.style.display = ''; return; }
+          if (!editingUserId && !body.password) { errEl.textContent = 'Wachtwoord is verplicht voor nieuwe gebruikers.'; errEl.style.display = ''; return; }
           try {
             if (editingUserId) {
               await api(`/api/admin/users/${editingUserId}`, { method: 'PUT', body: JSON.stringify(body) });
@@ -507,10 +627,7 @@ data:
             }
             cancelEdit();
             loadAdminPanel();
-          } catch (e) {
-            errEl.textContent = e.message;
-            errEl.style.display = '';
-          }
+          } catch (e) { errEl.textContent = e.message; errEl.style.display = ''; }
         }
 
         async function deleteUser(userId) {
@@ -532,17 +649,12 @@ data:
             userMap = {};
             users.forEach(u => userMap[u.id] = u);
 
-            if (users.length === 0) {
-              area.innerHTML = '<p style="color:#718096">Nog geen vrijwilligers.</p>';
-              return;
-            }
+            if (users.length === 0) { area.innerHTML = '<p style="color:#718096">Nog geen vrijwilligers.</p>'; return; }
 
             const rows = users.map(u => `<tr>
               <td style="font-weight:500">${esc(u.name)}</td>
               <td style="color:#718096;font-size:0.875rem">${esc(u.email)}</td>
-              <td>${u.is_admin
-                ? '<span class="badge-admin">Beheerder</span>'
-                : '<span style="color:#a0aec0;font-size:0.8rem">Vrijwilliger</span>'}</td>
+              <td>${u.is_admin ? '<span class="badge-admin">Beheerder</span>' : '<span style="color:#a0aec0;font-size:0.8rem">Vrijwilliger</span>'}</td>
               <td style="text-align:right">
                 <button class="btn-sm btn-edit" onclick="editUser(${u.id})">Bewerken</button>
                 <button class="btn-sm btn-del" onclick="deleteUser(${u.id})" style="margin-left:0.4rem">Verwijderen</button>
@@ -553,10 +665,298 @@ data:
               <thead><tr><th>Naam</th><th>E-mail</th><th>Rol</th><th></th></tr></thead>
               <tbody>${rows}</tbody>
             </table>`;
-          } catch (e) {
-            area.innerHTML = `<div class="error">${esc(e.message)}</div>`;
-          }
+          } catch (e) { area.innerHTML = `<div class="error">${esc(e.message)}</div>`; }
         }
+
+        // --- Admin: Stores ---
+
+        function cancelStoreEdit() {
+          editingStoreId = null;
+          document.getElementById('store-form-title').textContent = 'Winkel toevoegen';
+          document.getElementById('store-form-btn-text').textContent = 'Toevoegen';
+          document.getElementById('cancel-store-btn').style.display = 'none';
+          ['sf-name','sf-street','sf-postcode','sf-city','sf-contact','sf-phone'].forEach(id => document.getElementById(id).value = '');
+          document.getElementById('store-form-error').style.display = 'none';
+        }
+
+        function editStore(storeId) {
+          const s = storeMap[storeId];
+          if (!s) return;
+          editingStoreId = storeId;
+          document.getElementById('store-form-title').textContent = 'Winkel bewerken';
+          document.getElementById('store-form-btn-text').textContent = 'Opslaan';
+          document.getElementById('cancel-store-btn').style.display = '';
+          document.getElementById('sf-name').value = s.name;
+          document.getElementById('sf-street').value = s.street;
+          document.getElementById('sf-postcode').value = s.postcode;
+          document.getElementById('sf-city').value = s.city;
+          document.getElementById('sf-contact').value = s.contact_person || '';
+          document.getElementById('sf-phone').value = s.phone_number || '';
+          document.getElementById('store-form-error').style.display = 'none';
+          document.getElementById('store-form-card').scrollIntoView({ behavior: 'smooth' });
+          document.getElementById('sf-name').focus();
+        }
+
+        async function saveStore() {
+          const errEl = document.getElementById('store-form-error');
+          errEl.style.display = 'none';
+          const body = {
+            name: document.getElementById('sf-name').value.trim(),
+            street: document.getElementById('sf-street').value.trim(),
+            postcode: document.getElementById('sf-postcode').value.trim(),
+            city: document.getElementById('sf-city').value.trim(),
+            contact_person: document.getElementById('sf-contact').value.trim() || null,
+            phone_number: document.getElementById('sf-phone').value.trim() || null,
+          };
+          if (!body.name || !body.street || !body.postcode || !body.city) {
+            errEl.textContent = 'Naam, straat, postcode en plaats zijn verplicht.';
+            errEl.style.display = ''; return;
+          }
+          try {
+            if (editingStoreId) {
+              await api(`/api/admin/stores/${editingStoreId}`, { method: 'PUT', body: JSON.stringify(body) });
+            } else {
+              await api('/api/admin/stores', { method: 'POST', body: JSON.stringify(body) });
+            }
+            cancelStoreEdit();
+            loadStores();
+          } catch (e) { errEl.textContent = e.message; errEl.style.display = ''; }
+        }
+
+        async function deleteStore(storeId) {
+          const s = storeMap[storeId];
+          if (!confirm(`Winkel "${s ? s.name : 'deze winkel'}" verwijderen?`)) return;
+          try {
+            await api(`/api/admin/stores/${storeId}`, { method: 'DELETE' });
+            if (editingStoreId === storeId) cancelStoreEdit();
+            loadStores();
+          } catch (e) { alert(e.message); }
+        }
+
+        async function loadStores() {
+          const area = document.getElementById('stores-table-area');
+          if (!area) return;
+          try {
+            const stores = await api('/api/admin/stores');
+            allStores = stores;
+            storeMap = {};
+            stores.forEach(s => storeMap[s.id] = s);
+
+            if (stores.length === 0) { area.innerHTML = '<p style="color:#718096">Nog geen winkels toegevoegd.</p>'; return; }
+
+            const rows = stores.map(s => `<tr>
+              <td style="font-weight:500">${esc(s.name)}</td>
+              <td style="color:#718096;font-size:0.875rem">${esc(s.street)}, ${esc(s.postcode)} ${esc(s.city)}</td>
+              <td style="color:#718096;font-size:0.875rem">${s.contact_person ? esc(s.contact_person) : '<em style="color:#a0aec0">–</em>'}</td>
+              <td style="color:#718096;font-size:0.875rem">${s.phone_number ? esc(s.phone_number) : '<em style="color:#a0aec0">–</em>'}</td>
+              <td style="text-align:right">
+                <button class="btn-sm btn-edit" onclick="editStore(${s.id})">Bewerken</button>
+                <button class="btn-sm btn-del" onclick="deleteStore(${s.id})" style="margin-left:0.4rem">Verwijderen</button>
+              </td>
+            </tr>`).join('');
+
+            area.innerHTML = `<table>
+              <thead><tr><th>Naam</th><th>Adres</th><th>Contactpersoon</th><th>Telefoon</th><th></th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>`;
+          } catch (e) { area.innerHTML = `<div class="error">${esc(e.message)}</div>`; }
+        }
+
+        // --- Admin: Dates ---
+
+        function updateDayName() {
+          const val = document.getElementById('df-date').value;
+          const badge = document.getElementById('df-dayname');
+          if (!val) { badge.style.display = 'none'; return; }
+          const d = new Date(val + 'T00:00:00');
+          badge.textContent = DAYS[d.getDay()];
+          badge.style.display = '';
+        }
+
+        function populateStoreDropdown() {
+          const sel = document.getElementById('df-store');
+          const current = sel.value;
+          sel.innerHTML = '<option value="">— selecteer winkel —</option>' +
+            allStores.map(s => `<option value="${s.id}" ${s.id == current ? 'selected' : ''}>${esc(s.name)} (${esc(s.city)})</option>`).join('');
+        }
+
+        async function saveDate() {
+          const errEl = document.getElementById('date-form-error');
+          errEl.style.display = 'none';
+          const dateVal = document.getElementById('df-date').value;
+          const storeId = document.getElementById('df-store').value;
+          if (!dateVal) { errEl.textContent = 'Selecteer een datum.'; errEl.style.display = ''; return; }
+          if (!storeId) { errEl.textContent = 'Selecteer een winkel.'; errEl.style.display = ''; return; }
+          try {
+            await api('/api/admin/schedules', { method: 'POST', body: JSON.stringify({ date: dateVal, store_id: parseInt(storeId) }) });
+            document.getElementById('df-date').value = '';
+            document.getElementById('df-dayname').style.display = 'none';
+            document.getElementById('df-store').value = '';
+            loadDates();
+          } catch (e) { errEl.textContent = e.message; errEl.style.display = ''; }
+        }
+
+        async function deleteDate(scheduleId) {
+          if (!confirm('Datum verwijderen? Alle tijdsloten en aanmeldingen worden ook verwijderd.')) return;
+          try {
+            await api(`/api/admin/schedules/${scheduleId}`, { method: 'DELETE' });
+            loadDates();
+          } catch (e) { alert(e.message); }
+        }
+
+        function toggleEditSlot(slotId) {
+          const row = document.getElementById('edit-slot-row-' + slotId);
+          if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+        }
+
+        async function saveSlot(slotId) {
+          const label = document.getElementById(`es-label-${slotId}`).value.trim();
+          const start = document.getElementById(`es-start-${slotId}`).value;
+          const end = document.getElementById(`es-end-${slotId}`).value;
+          const count = parseInt(document.getElementById(`es-count-${slotId}`).value);
+          if (!label || !start || !end || !count) { alert('Vul alle velden in.'); return; }
+          try {
+            await api(`/api/admin/slots/${slotId}`, { method: 'PUT', body: JSON.stringify({ label, start_time: start, end_time: end, required_count: count }) });
+            loadDates();
+          } catch (e) { alert(e.message); }
+        }
+
+        async function deleteSlot(slotId) {
+          if (!confirm('Tijdslot verwijderen? Aanmeldingen worden ook verwijderd.')) return;
+          try {
+            await api(`/api/admin/slots/${slotId}`, { method: 'DELETE' });
+            loadDates();
+          } catch (e) { alert(e.message); }
+        }
+
+        function toggleAddSlotRow(scheduleId) {
+          const row = document.getElementById('add-slot-row-' + scheduleId);
+          if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+        }
+
+        async function addSlot(scheduleId) {
+          const label = document.getElementById(`ns-label-${scheduleId}`).value.trim();
+          const start = document.getElementById(`ns-start-${scheduleId}`).value;
+          const end = document.getElementById(`ns-end-${scheduleId}`).value;
+          const count = parseInt(document.getElementById(`ns-count-${scheduleId}`).value);
+          if (!label || !start || !end || !count) { alert('Vul alle velden in.'); return; }
+          try {
+            await api(`/api/admin/schedules/${scheduleId}/slots`, { method: 'POST', body: JSON.stringify({ label, start_time: start, end_time: end, required_count: count }) });
+            loadDates();
+          } catch (e) { alert(e.message); }
+        }
+
+        async function loadDates() {
+          const area = document.getElementById('dates-list-area');
+          if (!area) return;
+          try {
+            const stores = await api('/api/admin/stores');
+            allStores = stores;
+            storeMap = {};
+            stores.forEach(s => storeMap[s.id] = s);
+            populateStoreDropdown();
+
+            const schedules = await api('/api/admin/schedules');
+            if (schedules.length === 0) { area.innerHTML = '<p style="color:#718096">Nog geen data gepland.</p>'; return; }
+
+            area.innerHTML = schedules.map(s => {
+              const d = new Date(s.date + 'T00:00:00');
+              const dayName = DAYS[d.getDay()];
+              const storeName = s.store ? `${esc(s.store.name)} — ${esc(s.store.street)}, ${esc(s.store.postcode)} ${esc(s.store.city)}` : '<em style="color:#a0aec0">geen winkel</em>';
+
+              const slotRows = s.slots.map(slot => `
+                <tr>
+                  <td><div class="slot-label">${esc(slot.label)}</div><div class="slot-time">${slot.start_time} – ${slot.end_time}</div></td>
+                  <td>${slot.required_count} persoon${slot.required_count !== 1 ? 'en' : ''}</td>
+                  <td>${slot.signup_count} aangemeld</td>
+                  <td><div class="action-cell">
+                    <button class="btn-sm btn-edit" onclick="toggleEditSlot(${slot.id})">Bewerken</button>
+                    <button class="btn-sm btn-del" onclick="deleteSlot(${slot.id})">Verwijderen</button>
+                  </div></td>
+                </tr>
+                <tr id="edit-slot-row-${slot.id}" style="display:none" class="edit-slot-row">
+                  <td colspan="4">
+                    <div class="slot-edit-grid" style="padding:0.5rem 0">
+                      <div class="form-group" style="margin:0">
+                        <label style="font-size:0.75rem">Omschrijving</label>
+                        <input id="es-label-${slot.id}" type="text" value="${esc(slot.label)}" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                      </div>
+                      <div class="form-group" style="margin:0">
+                        <label style="font-size:0.75rem">Begintijd</label>
+                        <input id="es-start-${slot.id}" type="time" value="${slot.start_time}" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                      </div>
+                      <div class="form-group" style="margin:0">
+                        <label style="font-size:0.75rem">Eindtijd</label>
+                        <input id="es-end-${slot.id}" type="time" value="${slot.end_time}" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                      </div>
+                      <div class="form-group" style="margin:0">
+                        <label style="font-size:0.75rem">Aantal</label>
+                        <input id="es-count-${slot.id}" type="number" min="1" value="${slot.required_count}" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+                      <button class="btn-sm btn-signup" onclick="saveSlot(${slot.id})">Opslaan</button>
+                      <button class="btn-sm btn-muted" onclick="toggleEditSlot(${slot.id})">Annuleren</button>
+                    </div>
+                  </td>
+                </tr>`).join('');
+
+              const isPast = new Date(s.date + 'T00:00:00') < new Date(new Date().toDateString());
+
+              return `<div class="date-block">
+                <div class="date-block-header">
+                  <div class="date-block-info">
+                    <div class="date-block-title">
+                      ${fmtDate(s.date)}
+                      ${isPast ? '<span style="font-size:0.75rem;color:#a0aec0;font-weight:400;margin-left:0.5rem">(verleden)</span>' : ''}
+                    </div>
+                    <div class="date-block-sub">${storeName}</div>
+                  </div>
+                  <button class="btn-sm btn-del" onclick="deleteDate(${s.id})">Datum verwijderen</button>
+                </div>
+                <div class="date-block-body">
+                  <table>
+                    <thead><tr><th>Tijdslot</th><th>Capaciteit</th><th>Aanmeldingen</th><th></th></tr></thead>
+                    <tbody>
+                      ${slotRows}
+                      <tr id="add-slot-row-${s.id}" style="display:none" class="edit-slot-row">
+                        <td colspan="4">
+                          <div class="slot-edit-grid" style="padding:0.5rem 0">
+                            <div class="form-group" style="margin:0">
+                              <label style="font-size:0.75rem">Omschrijving</label>
+                              <input id="ns-label-${s.id}" type="text" placeholder="Bijv. Ochtendshift" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                              <label style="font-size:0.75rem">Begintijd</label>
+                              <input id="ns-start-${s.id}" type="time" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                              <label style="font-size:0.75rem">Eindtijd</label>
+                              <input id="ns-end-${s.id}" type="time" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                              <label style="font-size:0.75rem">Aantal</label>
+                              <input id="ns-count-${s.id}" type="number" min="1" value="1" style="padding:0.4rem 0.6rem;font-size:0.85rem">
+                            </div>
+                          </div>
+                          <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+                            <button class="btn-sm btn-signup" onclick="addSlot(${s.id})">Toevoegen</button>
+                            <button class="btn-sm btn-muted" onclick="toggleAddSlotRow(${s.id})">Annuleren</button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="margin-top:0.75rem">
+                    <button class="btn-sm btn-add" onclick="toggleAddSlotRow(${s.id})">+ Tijdslot toevoegen</button>
+                  </div>
+                </div>
+              </div>`;
+            }).join('');
+          } catch (e) { area.innerHTML = `<div class="error">${esc(e.message)}</div>`; }
+        }
+
+        // --- App shell ---
 
         function renderApp() {
           const authSection = document.getElementById('auth-section');

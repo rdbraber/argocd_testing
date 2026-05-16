@@ -13,7 +13,7 @@ spec:
       labels:
         app: frontend
       annotations:
-        checksum/config: "5693afa5"
+        checksum/config: "c4043573"
     spec:
       containers:
       - name: frontend
