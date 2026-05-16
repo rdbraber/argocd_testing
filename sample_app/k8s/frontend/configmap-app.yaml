@@ -10,33 +10,40 @@ data:
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Volunteer Scheduler</title>
+      <title>Voedselbank – Vrijwilligers Rooster</title>
       <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
-        header { background: #2b6cb0; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-        header h1 { font-size: 1.4rem; flex-shrink: 0; }
+        body { font-family: system-ui, sans-serif; background: #f7f3ef; color: #1a202c; min-height: 100vh; }
+
+        header { background: #ee7402; color: white; padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .header-logo { background: white; border-radius: 6px; padding: 0.4rem 0.75rem; display: flex; align-items: center; flex-shrink: 0; }
+        .header-logo svg { display: block; height: 36px; width: auto; }
         #user-info { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; flex-shrink: 0; }
         #logout-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; }
         #logout-btn:hover { background: rgba(255,255,255,0.3); }
+
         nav { display: flex; gap: 0.4rem; }
         .nav-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.35rem 1.1rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 500; }
-        .nav-btn.active { background: white; color: #2b6cb0; font-weight: 700; border-color: white; }
+        .nav-btn.active { background: white; color: #ee7402; font-weight: 700; border-color: white; }
         .nav-btn:hover:not(.active) { background: rgba(255,255,255,0.25); }
+
         main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
         .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 2rem; margin-bottom: 1.5rem; }
-        .inner-card { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem; }
+        .inner-card { background: #fdf7f2; border: 1px solid #fbd8b8; border-radius: 6px; padding: 1.25rem; margin-bottom: 1.5rem; }
+
         .tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; }
         .tab { background: none; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-size: 1rem; color: #718096; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .tab.active { color: #2b6cb0; border-bottom-color: #2b6cb0; font-weight: 600; }
+        .tab.active { color: #ee7402; border-bottom-color: #ee7402; font-weight: 600; }
+
         .form-group { margin-bottom: 1rem; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
         label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.4rem; color: #4a5568; }
         input[type=text], input[type=email], input[type=password] { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem; }
-        input:focus { outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 3px rgba(43,108,176,0.15); }
+        input:focus { outline: none; border-color: #ee7402; box-shadow: 0 0 0 3px rgba(238,115,12,0.15); }
+
         .btn { padding: 0.65rem 1.4rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: 600; }
-        .btn-primary { background: #2b6cb0; color: white; }
-        .btn-primary:hover { background: #2c5282; }
+        .btn-primary { background: #ee7402; color: white; }
+        .btn-primary:hover { background: #d4640a; }
         .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; }
         .btn-signup { background: #38a169; color: white; }
         .btn-signup:hover { background: #2f855a; }
@@ -44,13 +51,14 @@ data:
         .btn-cancel:hover { background: #c53030; }
         .btn-assign { background: #805ad5; color: white; }
         .btn-assign:hover { background: #6b46c1; }
-        .btn-edit { background: #3182ce; color: white; }
-        .btn-edit:hover { background: #2b6cb0; }
+        .btn-edit { background: #ee7402; color: white; }
+        .btn-edit:hover { background: #d4640a; }
         .btn-del { background: #e53e3e; color: white; }
         .btn-del:hover { background: #c53030; }
         .btn-disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
         .btn-muted { background: #e2e8f0; color: #4a5568; }
         .btn-muted:hover { background: #cbd5e0; }
+
         .error { color: #e53e3e; font-size: 0.875rem; margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: #fff5f5; border-radius: 4px; border: 1px solid #feb2b2; }
         .spinner { text-align: center; padding: 2rem; color: #718096; }
         h2 { font-size: 1.2rem; margin-bottom: 1.25rem; color: #2d3748; }
@@ -58,8 +66,8 @@ data:
 
         /* Schedule accordion */
         .schedule-block { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; overflow: hidden; }
-        .schedule-header { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background: #f7fafc; cursor: pointer; user-select: none; }
-        .schedule-header:hover { background: #edf2f7; }
+        .schedule-header { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background: #fdf7f2; cursor: pointer; user-select: none; }
+        .schedule-header:hover { background: #faeade; }
         .schedule-header.has-signup { background: #f0fff4; border-left: 3px solid #38a169; }
         .schedule-date { font-weight: 600; font-size: 1rem; color: #2d3748; }
         .schedule-summary { font-size: 0.8rem; color: #718096; margin-top: 0.15rem; }
@@ -70,7 +78,7 @@ data:
 
         /* Tables */
         table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.875rem; }
-        th { text-align: left; padding: 0.5rem 0.75rem; color: #4a5568; font-weight: 600; border-bottom: 2px solid #e2e8f0; background: #f7fafc; }
+        th { text-align: left; padding: 0.5rem 0.75rem; color: #4a5568; font-weight: 600; border-bottom: 2px solid #e2e8f0; background: #fdf7f2; }
         td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #f0f4f8; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         tr.slot-mine { background: #f0fff4; }
@@ -84,40 +92,74 @@ data:
         .volunteers { color: #4a5568; }
         .volunteers em { color: #a0aec0; }
         .badge-you { display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 9999px; background: #c6f6d5; color: #276749; font-weight: 700; margin-left: 0.3rem; }
-        .badge-admin { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #e9d8fd; color: #553c9a; font-weight: 700; }
+        .badge-admin { display: inline-block; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: #fde8c8; color: #9a3c07; font-weight: 700; }
         .remove-vol-btn { background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 0.85rem; font-weight: 700; padding: 0 0.15rem; line-height: 1; }
         .remove-vol-btn:hover { color: #c53030; }
-        .assign-row td { background: #ebf8ff; border-bottom: 1px solid #bee3f8; }
+        .assign-row td { background: #fff8f0; border-bottom: 1px solid #fbd8b8; }
         .action-cell { text-align: right; white-space: nowrap; display: flex; gap: 0.35rem; justify-content: flex-end; }
       </style>
     </head>
     <body>
       <header>
-        <h1>Volunteer Scheduler</h1>
+        <div class="header-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="182" height="42.094" viewBox="0 0 182 42.094">
+            <defs><clipPath id="clip-path"><rect width="182" height="42.094" fill="none"/></clipPath></defs>
+            <g clip-path="url(#clip-path)">
+              <path d="M21.412,39.657s-3.251,5.255,5.2,8.348c0,0-5.2-4.328-5.2-8.348" transform="translate(-5.512 -10.511)" fill="#ee7220"/>
+              <path d="M31.826,0a13.581,13.581,0,0,0-8.855,3.307A13.594,13.594,0,0,0,14.115,0C6.319,0,0,6.695,0,14.946a15.255,15.255,0,0,0,5.26,11.64L21.309,40.637a8.3,8.3,0,0,0-.821-2.106l-.254-.268-3.792-3.01c-2.6-1.781-1.626-5.334-1.626-5.334L16.007,5.5c.869-1.006,1.194.152,1.194.152l.215,20.327c-.108,1.776.649,1.854.649,1.854,1.3,0,1.192-1.623,1.192-1.623L20.234,6.04a1.245,1.245,0,0,1,.542-.929c1.082-.076.972,1.083.972,1.083V26.209a1.621,1.621,0,0,0,1.265,1.773,1.619,1.619,0,0,0,1.265-1.773V6.193s-.11-1.159.975-1.083a1.256,1.256,0,0,1,.541.929l.975,20.169s-.111,1.623,1.194,1.623c0,0,.757-.078.647-1.854l.218-20.327s.326-1.158,1.191-.152l1.189,24.42s.976,3.553-1.62,5.334L25.955,38.3h.012a7.5,7.5,0,0,0-.844,1.909L40.687,26.583a15.259,15.259,0,0,0,5.257-11.637C45.944,6.695,39.623,0,31.826,0" fill="#ee7220"/>
+              <path d="M31.234,40.136l3.633-3.049c2.6-1.78,1.62-5.334,1.62-5.334L35.3,7.335c-.865-1.007-1.192.151-1.192.151l-.218,20.327c.11,1.776-.647,1.854-.647,1.854-1.3,0-1.194-1.624-1.194-1.624L31.072,7.875a1.254,1.254,0,0,0-.54-.929c-1.084-.076-.975,1.083-.975,1.083V28.044a1.619,1.619,0,0,1-1.265,1.773,1.619,1.619,0,0,1-1.265-1.773V8.028s.11-1.159-.973-1.083a1.246,1.246,0,0,0-.542.929l-.977,20.169s.11,1.624-1.192,1.624c0,0-.756-.078-.648-1.854L22.479,7.486s-.325-1.158-1.194-.151L20.095,31.754s-.973,3.553,1.626,5.334l3.792,3.01.254.269a8.28,8.28,0,0,1,.821,2.1l1.662,1.457L30.4,42.046a7.507,7.507,0,0,1,.844-1.909ZM21.179,30.981c0,4.019,5.2,8.348,5.2,8.348-8.45-3.093-5.2-8.348-5.2-8.348" transform="translate(-5.279 -1.835)" fill="#fff"/>
+              <path d="M72.4,9.014l1.339,9.605h.035l1.339-9.605h3.535L75.9,21.761H71.618l-2.7-12.748Z" transform="translate(-18.268 -2.389)" fill="#161615"/>
+              <path d="M82.611,12.253a5.409,5.409,0,0,1,.767-2.053A3.12,3.12,0,0,1,84.79,9.04a6.453,6.453,0,0,1,4.285,0,3.122,3.122,0,0,1,1.41,1.16,5.409,5.409,0,0,1,.767,2.053,17.124,17.124,0,0,1,.232,3.044,17.118,17.118,0,0,1-.232,3.044,5.408,5.408,0,0,1-.767,2.053,2.958,2.958,0,0,1-1.41,1.133,6.928,6.928,0,0,1-4.285,0,2.956,2.956,0,0,1-1.411-1.133,5.408,5.408,0,0,1-.767-2.053,17.049,17.049,0,0,1-.232-3.044,17.055,17.055,0,0,1,.232-3.044m3.232,5.178a7.654,7.654,0,0,0,.151,1.349,1.306,1.306,0,0,0,.34.7,1.006,1.006,0,0,0,1.2,0,1.312,1.312,0,0,0,.34-.7,7.653,7.653,0,0,0,.151-1.349q.036-.848.036-2.134t-.036-2.134a7.643,7.643,0,0,0-.151-1.348,1.311,1.311,0,0,0-.34-.7,1.009,1.009,0,0,0-1.2,0,1.306,1.306,0,0,0-.34.7,7.644,7.644,0,0,0-.151,1.348q-.036.849-.036,2.134t.036,2.134" transform="translate(-21.835 -2.299)" fill="#161615"/>
+              <path d="M103.948,9.014v2.713H99.717v2.178h3.964v2.607H99.717v2.535h4.392v2.714H96.4V9.014Z" transform="translate(-25.55 -2.389)" fill="#161615"/>
+              <path d="M113.363,9.014a4.083,4.083,0,0,1,2.25.527,3.266,3.266,0,0,1,1.2,1.41,6,6,0,0,1,.491,2.035q.089,1.151.09,2.4t-.09,2.4a6.011,6.011,0,0,1-.491,2.036,3.274,3.274,0,0,1-1.2,1.41,4.089,4.089,0,0,1-2.25.527h-4.821V9.014Zm-.839,10.355a1.827,1.827,0,0,0,.768-.134.91.91,0,0,0,.437-.562,4.618,4.618,0,0,0,.2-1.214q.044-.786.045-2.071t-.045-2.071a4.623,4.623,0,0,0-.2-1.214.916.916,0,0,0-.437-.562,1.84,1.84,0,0,0-.768-.134h-.661v7.962Z" transform="translate(-28.769 -2.389)" fill="#161615"/>
+              <path d="M127.307,12.3a1.913,1.913,0,0,0-.232-.973.769.769,0,0,0-.714-.4.9.9,0,0,0-.786.348,1.3,1.3,0,0,0-.249.776,1.273,1.273,0,0,0,.4.991,3.693,3.693,0,0,0,1.009.634q.606.268,1.3.545a5.857,5.857,0,0,1,1.3.722,3.6,3.6,0,0,1,1.009,1.169,3.867,3.867,0,0,1,.4,1.884,3.543,3.543,0,0,1-1.16,2.955,5.311,5.311,0,0,1-3.357.919,8.81,8.81,0,0,1-1.829-.17,3.275,3.275,0,0,1-1.339-.589,2.645,2.645,0,0,1-.83-1.1,4.333,4.333,0,0,1-.286-1.678v-.447h3.214v.3a1.7,1.7,0,0,0,.3,1.152,1.016,1.016,0,0,0,.786.331.944.944,0,0,0,.794-.357,1.384,1.384,0,0,0,.277-.875,1.306,1.306,0,0,0-.384-.991,3.387,3.387,0,0,0-.964-.625q-.58-.258-1.259-.527a5.484,5.484,0,0,1-1.258-.7,3.431,3.431,0,0,1-.964-1.124,3.764,3.764,0,0,1-.384-1.821,3.974,3.974,0,0,1,1.036-2.963,4.319,4.319,0,0,1,3.142-1.018,4.434,4.434,0,0,1,3.151.937,4,4,0,0,1,.973,2.991h-3.107Z" transform="translate(-32.323 -2.299)" fill="#161615"/>
+              <path d="M143.082,9.014v2.713H138.85v2.178h3.964v2.607H138.85v2.535h4.392v2.714H135.53V9.014Z" transform="translate(-35.922 -2.389)" fill="#161615"/>
+              <path d="M151,9.014V19.047h4.089v2.714h-7.409V9.014Z" transform="translate(-39.142 -2.389)" fill="#161615"/>
+              <path d="M164.086,9.014a3.544,3.544,0,0,1,2.633.866,3.163,3.163,0,0,1,.848,2.312,4.071,4.071,0,0,1-.116.972,2.9,2.9,0,0,1-.357.858,2.3,2.3,0,0,1-.616.651,2.329,2.329,0,0,1-.911.375v.036a2.388,2.388,0,0,1,1.072.331,2.452,2.452,0,0,1,.731.687,2.9,2.9,0,0,1,.42.9,3.739,3.739,0,0,1,.134.991,5.149,5.149,0,0,1-.215,1.518,3.1,3.1,0,0,1-.67,1.2,3.007,3.007,0,0,1-1.187.776,5,5,0,0,1-1.768.278h-5.017V9.014Zm-.893,5a.9.9,0,0,0,.786-.384,1.534,1.534,0,0,0,.268-.9,1.61,1.61,0,0,0-.268-.929.89.89,0,0,0-.786-.392h-.8v2.607Zm.125,5.356a1.092,1.092,0,0,0,.822-.384A1.7,1.7,0,0,0,164.5,17.8a1.645,1.645,0,0,0-.356-1.142,1.085,1.085,0,0,0-.822-.393h-.928v3.107Z" transform="translate(-42.161 -2.389)" fill="#161615"/>
+              <path d="M178.784,9.013l3.107,12.748h-3.535l-.339-2.232h-2.643l-.339,2.232h-3.481l3.053-12.748Zm-2.106,2.607-.911,5.409h1.856l-.911-5.409Z" transform="translate(-45.47 -2.389)" fill="#161615"/>
+              <path d="M190.086,9.014l2.142,7.855h.036V9.014h3.106V21.761h-3.642l-2.214-7.874h-.036v7.874h-3.107V9.014Z" transform="translate(-49.398 -2.389)" fill="#161615"/>
+              <path d="M203.9,9.014v4.892h.035L206.4,9.014h3.535l-3.214,5.57,3.606,7.178h-3.785L204.6,17.316l-.7,1.071v3.375h-3.321V9.014Z" transform="translate(-53.164 -2.389)" fill="#161615"/>
+              <rect width="2.999" height="3.535" transform="translate(159.416 15.837)" fill="#ee7220"/>
+              <path d="M226.888,9.014l2.142,7.855h.036V9.014h3.107V21.761h-3.642l-2.214-7.874h-.036v7.874h-3.106V9.014Z" transform="translate(-59.153 -2.389)" fill="#ee7220"/>
+              <path d="M240.875,9.014V19.047h4.089v2.714h-7.409V9.014Z" transform="translate(-62.964 -2.389)" fill="#ee7220"/>
+              <path d="M67.223,44.764a.236.236,0,0,0,.219-.219l1.6-9.563-1.057-.056a4.034,4.034,0,0,1,.182-.837c.729-.055,2.314-.127,3.589-.127a6.089,6.089,0,0,1,2.35.381,2.625,2.625,0,0,1,1.621,2.405A3.616,3.616,0,0,1,72.98,40.1l-.018.11c.875.437,1.129,1.566,1.657,3.315.273.911.492,1.183.819,1.2l.8.054a4.215,4.215,0,0,1-.182.8c-.218.018-1.147.054-1.439.073-.309.018-1.056.073-1.275.073a30.35,30.35,0,0,1-1.238-3.862c-.273-.8-.583-1.147-1.457-1.147a2.442,2.442,0,0,0-.638.035l-.747,3.972,1.257.109a4.8,4.8,0,0,1-.182.856c-.329-.018-1.148-.036-2.186-.036-.783,0-1.53.018-1.931.036a5.5,5.5,0,0,1,.164-.819Zm2.952-4.919a2.084,2.084,0,0,0,.564.037,2.774,2.774,0,0,0,3.006-2.86,2.046,2.046,0,0,0-1.913-2.259,1.712,1.712,0,0,0-.765.109Z" transform="translate(-17.552 -9.001)" fill="#ee7220"/>
+              <path d="M87.57,42.5a5.544,5.544,0,0,1-1.785,4.008,3.663,3.663,0,0,1-2.6.874,2.372,2.372,0,0,1-2-.856,2.937,2.937,0,0,1-.528-1.676,5.731,5.731,0,0,1,1.676-4.08,3.922,3.922,0,0,1,2.75-1.057,2.306,2.306,0,0,1,1.931.819,3.046,3.046,0,0,1,.565,1.95Zm-3.953,4.063a1.553,1.553,0,0,0,1.13-.711,8.689,8.689,0,0,0,.947-3.789,2.451,2.451,0,0,0-.2-1.074.816.816,0,0,0-.783-.456,1.53,1.53,0,0,0-1.166.711,7.5,7.5,0,0,0-.983,3.68,2.572,2.572,0,0,0,.2,1.166.858.858,0,0,0,.838.474Z" transform="translate(-21.376 -10.525)" fill="#ee7220"/>
+              <path d="M93.522,44.781c0,.456.328.62.711.62A7.439,7.439,0,0,0,96.2,45a2.382,2.382,0,0,1,.037.875,9,9,0,0,1-3.425.71,1.92,1.92,0,0,1-1.22-1.056.424.424,0,0,1-.037-.219,24.189,24.189,0,0,1,.547-2.932c.091-.437.346-1.585.456-2.022H91.281a3.016,3.016,0,0,1,.237-.857c.273-.018.765-.072,1.038-.091A.435.435,0,0,0,92.9,39.1c.146-.492.365-1.257.51-1.658a4.131,4.131,0,0,1,1.712-.455c.037,0,.037.036.018.091-.091.4-.346,1.457-.547,2.3.856,0,1.859-.019,2.569-.056a3.577,3.577,0,0,1-.309,1.057c-.365,0-1.585-.018-2.459-.036-.11.418-.255,1.074-.383,1.584a23.428,23.428,0,0,0-.492,2.843Z" transform="translate(-24.194 -9.803)" fill="#ee7220"/>
+              <path d="M101.777,44.781c0,.456.328.62.711.62a7.439,7.439,0,0,0,1.967-.4,2.382,2.382,0,0,1,.037.875,9,9,0,0,1-3.425.71,1.92,1.92,0,0,1-1.22-1.056.424.424,0,0,1-.037-.219,24.19,24.19,0,0,1,.547-2.932c.091-.437.346-1.585.455-2.022H99.536a3.016,3.016,0,0,1,.237-.857c.273-.018.765-.072,1.038-.091a.435.435,0,0,0,.346-.309c.146-.492.365-1.257.51-1.658a4.131,4.131,0,0,1,1.713-.455c.035,0,.035.036.018.091-.091.4-.346,1.457-.547,2.3.856,0,1.859-.019,2.569-.056a3.577,3.577,0,0,1-.309,1.057c-.365,0-1.585-.018-2.459-.036-.11.418-.255,1.074-.383,1.584a23.428,23.428,0,0,0-.492,2.843Z" transform="translate(-26.382 -9.803)" fill="#ee7220"/>
+              <path d="M107.27,45a6.256,6.256,0,0,1,1.676-3.917,3.813,3.813,0,0,1,2.787-1.349,2.137,2.137,0,0,1,2.113,1.859,2.792,2.792,0,0,1-.856,1.638,7.83,7.83,0,0,1-3.679.675,5.21,5.21,0,0,0-.128,1.02,1.214,1.214,0,0,0,1.166,1.348,6.479,6.479,0,0,0,2.624-.692,2.094,2.094,0,0,1,.218.728,7.585,7.585,0,0,1-3.625,1.075,2.285,2.285,0,0,1-2.3-2.368Zm3.917-4.354a1.245,1.245,0,0,0-.966.583,4.872,4.872,0,0,0-.747,1.858,4.322,4.322,0,0,0,1.949-.328.959.959,0,0,0,.62-.911c0-.511-.237-1.2-.838-1.2Z" transform="translate(-28.432 -10.532)" fill="#ee7220"/>
+              <path d="M117.313,41.011a3.164,3.164,0,0,1-.054-.819,24.087,24.087,0,0,0,2.441-.456,1.228,1.228,0,0,1,.656.528c-.073.4-.291,1.185-.528,2.169l.165.054c.947-1.621,1.912-2.752,2.532-2.752a1.86,1.86,0,0,1,.874.2,3.169,3.169,0,0,1-.528,1.822,3.784,3.784,0,0,0-.765-.147c-.783,0-2.168,1.786-2.569,3.152-.146.492-.474,1.73-.656,2.4-.565.037-1.112.037-1.695.037.237-1.038.984-4.372,1.33-6.213Z" transform="translate(-31.06 -10.532)" fill="#ee7220"/>
+              <path d="M129.645,43.514a6.236,6.236,0,0,1-3.006,2.022,2.113,2.113,0,0,1-1.366-.91,1.612,1.612,0,0,1-.255-.875,8.293,8.293,0,0,1,.42-2.313c.473-1.4,1.748-3.607,3.534-3.607a2.647,2.647,0,0,1,1.657.548h.091c.256-1.257.656-3.243.911-4.554l-1.513-.018a2.289,2.289,0,0,1-.036-.783c2-.237,2.878-.473,3.006-.473a1.153,1.153,0,0,1,.6.51c-.474,1.948-2.077,9.272-2.5,11.2a.122.122,0,0,0,.128.146,7.525,7.525,0,0,0,1-.091,2.4,2.4,0,0,1,.018.8,10.973,10.973,0,0,1-2.223.291,1.167,1.167,0,0,1-.6-.492,11.948,11.948,0,0,1,.237-1.366Zm-2.2.693c.674,0,2.2-1.567,2.5-2.459.165-.565.365-1.567.51-2.3a1.472,1.472,0,0,0-1.147-.548c-.856,0-1.421.893-1.8,1.913a8.965,8.965,0,0,0-.583,2.624c0,.564.291.765.51.765Z" transform="translate(-33.136 -8.627)" fill="#ee7220"/>
+              <path d="M140.636,45.415a5.156,5.156,0,0,1-2.915,1.967,2.333,2.333,0,0,1-1.294-.892,1.569,1.569,0,0,1-.255-.874,8.346,8.346,0,0,1,.437-2.332c.437-1.311,1.767-3.607,3.515-3.607a2.352,2.352,0,0,1,1.749.783h.091l.565-.947a5.154,5.154,0,0,1,1.293.456,58.488,58.488,0,0,0-1.567,6.139.119.119,0,0,0,.109.146,9.537,9.537,0,0,0,1-.128,2,2,0,0,1,.018.8,11.243,11.243,0,0,1-2.331.327,1.2,1.2,0,0,1-.547-.492,10.645,10.645,0,0,1,.255-1.311Zm-.219-4.663c-.819,0-1.4,1-1.749,1.876a8.083,8.083,0,0,0-.6,2.661c0,.564.273.765.492.765.62,0,1.931-1.367,2.314-2.186a20.848,20.848,0,0,0,.692-2.386,1.309,1.309,0,0,0-1.13-.73Z" transform="translate(-36.093 -10.473)" fill="#ee7220"/>
+              <path d="M147.682,41.048a2.973,2.973,0,0,1-.037-.8c1.111-.164,2.423-.511,2.6-.511.165,0,.438.274.565.456-.073.437-.218,1.093-.365,1.693l.128.037a5.138,5.138,0,0,1,3.005-2.186,1.859,1.859,0,0,1,1.239.839,1.088,1.088,0,0,1,.109.528,5.328,5.328,0,0,1-.09.819l.109.019a4.824,4.824,0,0,1,2.9-2.078,2.067,2.067,0,0,1,1.33.893,1.3,1.3,0,0,1,.182.674,20.115,20.115,0,0,1-1.239,4.737c-.036.109-.018.182.073.182a5.655,5.655,0,0,0,1.093-.091,3.953,3.953,0,0,1-.018.8,12.6,12.6,0,0,1-2.386.254,1.091,1.091,0,0,1-.6-.618c.309-.947.692-2.3.911-3.152a14.046,14.046,0,0,0,.346-1.749.476.476,0,0,0-.474-.509c-.838,0-2.367,1.913-2.7,3.06-.218.784-.528,1.986-.747,2.806-.547.054-1.13.054-1.676.054.254-1.02.711-2.841.947-3.789a11.2,11.2,0,0,0,.329-1.713c0-.218-.128-.509-.4-.509-.947,0-2.46,2.039-2.751,3.06-.2.692-.6,2.368-.747,2.9-.565.054-1.13.054-1.676.054.31-1.348.948-4.226,1.348-6.176Z" transform="translate(-39.13 -10.532)" fill="#ee7220"/>
+            </g>
+          </svg>
+        </div>
+
         <nav id="view-nav" style="display:none">
-          <button id="nav-schedule" class="nav-btn active" onclick="switchView('schedule')">Schedule</button>
-          <button id="nav-admin" class="nav-btn" onclick="switchView('admin')">Admin Panel</button>
+          <button id="nav-schedule" class="nav-btn active" onclick="switchView('schedule')">Rooster</button>
+          <button id="nav-admin" class="nav-btn" onclick="switchView('admin')">Beheer</button>
         </nav>
         <div id="user-info"></div>
       </header>
+
       <main>
         <!-- Auth -->
         <div id="auth-section" class="card" style="display:none">
           <div class="tabs">
-            <button class="tab active" onclick="showTab('login')">Login</button>
-            <button class="tab" onclick="showTab('register')">Register</button>
+            <button class="tab active" onclick="showTab('login')">Inloggen</button>
+            <button class="tab" onclick="showTab('register')">Registreren</button>
           </div>
           <div id="login-form">
-            <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="your@email.com"></div>
-            <div class="form-group"><label>Password</label><input id="login-password" type="password" placeholder="••••••••"></div>
-            <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="doLogin()">Login</button>
+            <div class="form-group"><label>E-mailadres</label><input id="login-email" type="email" placeholder="jouw@email.nl"></div>
+            <div class="form-group"><label>Wachtwoord</label><input id="login-password" type="password" placeholder="••••••••"></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="doLogin()">Inloggen</button>
             <div id="login-error" class="error" style="display:none"></div>
           </div>
           <div id="register-form" style="display:none">
-            <div class="form-group"><label>Name</label><input id="reg-name" type="text" placeholder="Your name"></div>
-            <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="your@email.com"></div>
-            <div class="form-group"><label>Password</label><input id="reg-password" type="password" placeholder="••••••••"></div>
-            <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="doRegister()">Create account</button>
+            <div class="form-group"><label>Naam</label><input id="reg-name" type="text" placeholder="Jouw naam"></div>
+            <div class="form-group"><label>E-mailadres</label><input id="reg-email" type="email" placeholder="jouw@email.nl"></div>
+            <div class="form-group"><label>Wachtwoord</label><input id="reg-password" type="password" placeholder="••••••••"></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="doRegister()">Account aanmaken</button>
             <div id="register-error" class="error" style="display:none"></div>
           </div>
         </div>
@@ -125,44 +167,44 @@ data:
         <!-- Schedule -->
         <div id="schedule-section" style="display:none">
           <div class="card">
-            <h2>Upcoming Saturdays</h2>
-            <div id="schedule-list"><div class="spinner">Loading...</div></div>
+            <h2>Komende zaterdagen</h2>
+            <div id="schedule-list"><div class="spinner">Laden...</div></div>
           </div>
         </div>
 
         <!-- Admin Panel -->
         <div id="admin-section" style="display:none">
           <div class="card">
-            <h2>User Management</h2>
+            <h2>Vrijwilligers beheren</h2>
 
             <div class="inner-card" id="user-form-card">
-              <h3 id="form-title">Create User</h3>
+              <h3 id="form-title">Vrijwilliger toevoegen</h3>
               <div class="form-grid">
                 <div class="form-group">
-                  <label>Name</label>
-                  <input id="uf-name" type="text" placeholder="Full name">
+                  <label>Naam</label>
+                  <input id="uf-name" type="text" placeholder="Volledige naam">
                 </div>
                 <div class="form-group">
-                  <label>Email</label>
-                  <input id="uf-email" type="email" placeholder="email@example.com">
+                  <label>E-mailadres</label>
+                  <input id="uf-email" type="email" placeholder="email@voorbeeld.nl">
                 </div>
                 <div class="form-group">
-                  <label id="uf-pwd-label">Password</label>
+                  <label id="uf-pwd-label">Wachtwoord</label>
                   <input id="uf-password" type="password" placeholder="••••••••">
                 </div>
                 <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.6rem">
                   <input id="uf-admin" type="checkbox" style="width:auto;cursor:pointer">
-                  <label for="uf-admin" style="margin:0;cursor:pointer">Grant admin access</label>
+                  <label for="uf-admin" style="margin:0;cursor:pointer">Beheerder toegang</label>
                 </div>
               </div>
               <div style="display:flex;gap:0.75rem;margin-top:0.25rem">
-                <button class="btn btn-primary" onclick="saveUser()"><span id="form-btn-text">Create User</span></button>
-                <button id="cancel-edit-btn" class="btn btn-muted" style="display:none" onclick="cancelEdit()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveUser()"><span id="form-btn-text">Toevoegen</span></button>
+                <button id="cancel-edit-btn" class="btn btn-muted" style="display:none" onclick="cancelEdit()">Annuleren</button>
               </div>
               <div id="user-form-error" class="error" style="display:none"></div>
             </div>
 
-            <div id="users-table-area"><div class="spinner">Loading users...</div></div>
+            <div id="users-table-area"><div class="spinner">Laden...</div></div>
           </div>
         </div>
       </main>
@@ -246,8 +288,6 @@ data:
           if (view === 'admin') loadAdminPanel();
         }
 
-        // --- Schedule ---
-
         async function doSlotSignup(slotId) {
           try { await api(`/api/slots/${slotId}/signup`, { method: 'POST' }); loadSchedules(); }
           catch (e) { alert(e.message); }
@@ -280,7 +320,7 @@ data:
         }
 
         async function doAdminRemoveFromSlot(slotId, userId) {
-          if (!confirm('Remove this volunteer from the slot?')) return;
+          if (!confirm('Vrijwilliger uit dit tijdslot verwijderen?')) return;
           try {
             await api(`/api/admin/slots/${slotId}/users/${userId}`, { method: 'DELETE' });
             loadSchedules();
@@ -309,10 +349,10 @@ data:
                 const uid = slot.volunteer_ids[i];
                 const isMe = name === userName;
                 const display = isMe
-                  ? `<strong>${esc(name)}</strong><span class="badge-you">you</span>`
+                  ? `<strong>${esc(name)}</strong><span class="badge-you">jij</span>`
                   : esc(name);
                 if (isAdmin) {
-                  return `${display}&nbsp;<button class="remove-vol-btn" onclick="doAdminRemoveFromSlot(${slot.id},${uid})" title="Remove">×</button>`;
+                  return `${display}&nbsp;<button class="remove-vol-btn" onclick="doAdminRemoveFromSlot(${slot.id},${uid})" title="Verwijderen">×</button>`;
                 }
                 return display;
               }).join(', ');
@@ -320,15 +360,15 @@ data:
 
             let actionBtn = '';
             if (slot.signed_up) {
-              actionBtn = `<button class="btn-sm btn-cancel" onclick="doSlotCancel(${slot.id})">Sign off</button>`;
+              actionBtn = `<button class="btn-sm btn-cancel" onclick="doSlotCancel(${slot.id})">Afmelden</button>`;
             } else if (isFull && !isAdmin) {
-              actionBtn = `<button class="btn-sm btn-disabled" disabled>Full</button>`;
+              actionBtn = `<button class="btn-sm btn-disabled" disabled>Vol</button>`;
             } else {
-              actionBtn = `<button class="btn-sm btn-signup" onclick="doSlotSignup(${slot.id})">Sign up</button>`;
+              actionBtn = `<button class="btn-sm btn-signup" onclick="doSlotSignup(${slot.id})">Aanmelden</button>`;
             }
 
             const assignBtn = isAdmin
-              ? `<button class="btn-sm btn-assign" onclick="toggleAssignRow(${slot.id})">+ Assign</button>`
+              ? `<button class="btn-sm btn-assign" onclick="toggleAssignRow(${slot.id})">+ Toewijzen</button>`
               : '';
 
             rows.push(`<tr class="${slot.signed_up ? 'slot-mine' : ''}">
@@ -351,14 +391,14 @@ data:
               const available = allUsers.filter(u => !signedUpIds.has(u.id));
               const options = available.length
                 ? available.map(u => `<option value="${u.id}">${esc(u.name)}</option>`).join('')
-                : '<option value="" disabled>No available users</option>';
+                : '<option value="" disabled>Geen beschikbare vrijwilligers</option>';
               rows.push(`<tr id="assign-row-${slot.id}" class="assign-row" style="display:none">
                 <td colspan="4">
                   <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;padding:0.25rem 0">
-                    <span style="font-size:0.85rem;font-weight:600;color:#553c9a">Assign to slot:</span>
+                    <span style="font-size:0.85rem;font-weight:600;color:#805ad5">Toewijzen:</span>
                     <select id="assign-sel-${slot.id}" style="padding:0.3rem 0.5rem;border-radius:4px;border:1px solid #cbd5e0;font-size:0.85rem">${options}</select>
-                    ${available.length ? `<button class="btn-sm btn-signup" onclick="doAdminAssign(${slot.id})">Confirm</button>` : ''}
-                    <button class="btn-sm btn-muted" onclick="toggleAssignRow(${slot.id})">Cancel</button>
+                    ${available.length ? `<button class="btn-sm btn-signup" onclick="doAdminAssign(${slot.id})">Bevestigen</button>` : ''}
+                    <button class="btn-sm btn-muted" onclick="toggleAssignRow(${slot.id})">Annuleren</button>
                   </div>
                 </td>
               </tr>`);
@@ -366,7 +406,7 @@ data:
           });
 
           return `<table>
-            <thead><tr><th>Slot</th><th>Filled</th><th>Volunteers</th><th></th></tr></thead>
+            <thead><tr><th>Tijdslot</th><th>Bezetting</th><th>Vrijwilligers</th><th></th></tr></thead>
             <tbody>${rows.join('')}</tbody>
           </table>`;
         }
@@ -378,7 +418,7 @@ data:
             if (isAdmin) await loadAllUsers();
             const schedules = await api('/api/schedules');
             if (schedules.length === 0) {
-              list.innerHTML = '<p style="color:#718096">No upcoming Saturdays scheduled.</p>';
+              list.innerHTML = '<p style="color:#718096">Geen komende zaterdagen gepland.</p>';
               return;
             }
 
@@ -389,7 +429,7 @@ data:
 
             list.innerHTML = schedules.map(s => {
               const d = new Date(s.date + 'T00:00:00');
-              const label = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+              const label = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
               const mySlots = s.slots.filter(sl => sl.signed_up).length;
               const totalFilled = s.slots.reduce((a, sl) => a + sl.signup_count, 0);
               const totalNeeded = s.slots.reduce((a, sl) => a + sl.required_count, 0);
@@ -399,8 +439,8 @@ data:
               return `<div class="schedule-block">
                 <div class="schedule-header ${hasMine ? 'has-signup' : ''}" onclick="toggleSlots(${s.id})">
                   <div>
-                    <div class="schedule-date">${label}</div>
-                    <div class="schedule-summary">${totalFilled} of ${totalNeeded} spots filled${hasMine ? ' &mdash; <strong style="color:#276749">you\'re signed up</strong>' : ''}</div>
+                    <div class="schedule-date">${label.charAt(0).toUpperCase() + label.slice(1)}</div>
+                    <div class="schedule-summary">${totalFilled} van ${totalNeeded} plaatsen bezet${hasMine ? ' &mdash; <strong style="color:#276749">jij bent aangemeld</strong>' : ''}</div>
                   </div>
                   <span class="chevron ${isOpen ? 'open' : ''}" id="chev-${s.id}">&#9660;</span>
                 </div>
@@ -415,14 +455,12 @@ data:
           }
         }
 
-        // --- Admin Panel ---
-
         function cancelEdit() {
           editingUserId = null;
-          document.getElementById('form-title').textContent = 'Create User';
-          document.getElementById('form-btn-text').textContent = 'Create User';
+          document.getElementById('form-title').textContent = 'Vrijwilliger toevoegen';
+          document.getElementById('form-btn-text').textContent = 'Toevoegen';
           document.getElementById('cancel-edit-btn').style.display = 'none';
-          document.getElementById('uf-pwd-label').textContent = 'Password';
+          document.getElementById('uf-pwd-label').textContent = 'Wachtwoord';
           document.getElementById('uf-name').value = '';
           document.getElementById('uf-email').value = '';
           document.getElementById('uf-password').value = '';
@@ -434,10 +472,10 @@ data:
           const u = userMap[userId];
           if (!u) return;
           editingUserId = userId;
-          document.getElementById('form-title').textContent = 'Edit User';
-          document.getElementById('form-btn-text').textContent = 'Update User';
+          document.getElementById('form-title').textContent = 'Vrijwilliger bewerken';
+          document.getElementById('form-btn-text').textContent = 'Opslaan';
           document.getElementById('cancel-edit-btn').style.display = '';
-          document.getElementById('uf-pwd-label').textContent = 'Password (leave blank to keep)';
+          document.getElementById('uf-pwd-label').textContent = 'Wachtwoord (leeg = ongewijzigd)';
           document.getElementById('uf-name').value = u.name;
           document.getElementById('uf-email').value = u.email;
           document.getElementById('uf-password').value = '';
@@ -457,12 +495,12 @@ data:
             is_admin: document.getElementById('uf-admin').checked,
           };
           if (!body.name || !body.email) {
-            errEl.textContent = 'Name and email are required.';
+            errEl.textContent = 'Naam en e-mailadres zijn verplicht.';
             errEl.style.display = '';
             return;
           }
           if (!editingUserId && !body.password) {
-            errEl.textContent = 'Password is required for new users.';
+            errEl.textContent = 'Wachtwoord is verplicht voor nieuwe gebruikers.';
             errEl.style.display = '';
             return;
           }
@@ -482,7 +520,7 @@ data:
 
         async function deleteUser(userId) {
           const u = userMap[userId];
-          if (!confirm(`Delete user "${u ? u.name : 'this user'}"? Their slot sign-ups will also be removed.`)) return;
+          if (!confirm(`Vrijwilliger "${u ? u.name : 'deze gebruiker'}" verwijderen? Hun aanmeldingen worden ook verwijderd.`)) return;
           try {
             await api(`/api/admin/users/${userId}`, { method: 'DELETE' });
             if (editingUserId === userId) cancelEdit();
@@ -500,7 +538,7 @@ data:
             users.forEach(u => userMap[u.id] = u);
 
             if (users.length === 0) {
-              area.innerHTML = '<p style="color:#718096">No users yet.</p>';
+              area.innerHTML = '<p style="color:#718096">Nog geen vrijwilligers.</p>';
               return;
             }
 
@@ -508,24 +546,22 @@ data:
               <td style="font-weight:500">${esc(u.name)}</td>
               <td style="color:#718096;font-size:0.875rem">${esc(u.email)}</td>
               <td>${u.is_admin
-                ? '<span class="badge-admin">Admin</span>'
-                : '<span style="color:#a0aec0;font-size:0.8rem">Volunteer</span>'}</td>
+                ? '<span class="badge-admin">Beheerder</span>'
+                : '<span style="color:#a0aec0;font-size:0.8rem">Vrijwilliger</span>'}</td>
               <td style="text-align:right">
-                <button class="btn-sm btn-edit" onclick="editUser(${u.id})">Edit</button>
-                <button class="btn-sm btn-del" onclick="deleteUser(${u.id})" style="margin-left:0.4rem">Delete</button>
+                <button class="btn-sm btn-edit" onclick="editUser(${u.id})">Bewerken</button>
+                <button class="btn-sm btn-del" onclick="deleteUser(${u.id})" style="margin-left:0.4rem">Verwijderen</button>
               </td>
             </tr>`).join('');
 
             area.innerHTML = `<table>
-              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+              <thead><tr><th>Naam</th><th>E-mail</th><th>Rol</th><th></th></tr></thead>
               <tbody>${rows}</tbody>
             </table>`;
           } catch (e) {
             area.innerHTML = `<div class="error">${esc(e.message)}</div>`;
           }
         }
-
-        // --- App shell ---
 
         function renderApp() {
           const authSection = document.getElementById('auth-section');
@@ -536,7 +572,7 @@ data:
 
           if (token && userName) {
             authSection.style.display = 'none';
-            userInfo.innerHTML = `<span>Hello, ${esc(userName)}</span><button id="logout-btn" onclick="doLogout()">Logout</button>`;
+            userInfo.innerHTML = `<span>Hallo, ${esc(userName)}</span><button id="logout-btn" onclick="doLogout()">Uitloggen</button>`;
             if (isAdmin) {
               viewNav.style.display = '';
               switchView(currentView);
