@@ -23,15 +23,27 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 security = HTTPBearer()
 
-SLOT_TEMPLATES = [
-    {"start_time": "09:00", "end_time": "10:30", "required_count": 1, "label": "Driver"},
-    {"start_time": "10:00", "end_time": "13:00", "required_count": 2, "label": "Morning shift"},
-    {"start_time": "13:00", "end_time": "16:00", "required_count": 2, "label": "Afternoon shift"},
-    {"start_time": "15:30", "end_time": "17:00", "required_count": 2, "label": "Driver & Helper"},
+DEFAULT_SLOTS = [
+    {"start_time": "09:00", "end_time": "10:30", "required_count": 1, "label": "Chauffeur"},
+    {"start_time": "10:00", "end_time": "13:00", "required_count": 2, "label": "Ochtendshift"},
+    {"start_time": "13:00", "end_time": "16:00", "required_count": 2, "label": "Middagshift"},
+    {"start_time": "15:30", "end_time": "17:00", "required_count": 2, "label": "Chauffeur & Helper"},
 ]
 
 
 # --- Models ---
+
+class Store(Base):
+    __tablename__ = "stores"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200), nullable=False)
+    street = Column(String(200), nullable=False)
+    postcode = Column(String(20), nullable=False)
+    city = Column(String(100), nullable=False)
+    contact_person = Column(String(100), nullable=True)
+    phone_number = Column(String(50), nullable=True)
+    schedules = relationship("Schedule", back_populates="store")
+
 
 class User(Base):
     __tablename__ = "users"
@@ -48,7 +60,10 @@ class Schedule(Base):
     __tablename__ = "schedules"
     id = Column(Integer, primary_key=True)
     date = Column(Date, unique=True, nullable=False)
-    slots = relationship("TimeSlot", back_populates="schedule", order_by="TimeSlot.start_time")
+    store_id = Column(Integer, ForeignKey("stores.id"), nullable=True)
+    store = relationship("Store", back_populates="schedules")
+    slots = relationship("TimeSlot", back_populates="schedule", order_by="TimeSlot.start_time",
+                         cascade="all, delete-orphan")
 
 
 class TimeSlot(Base):
@@ -111,6 +126,33 @@ class AdminUpdateUserRequest(BaseModel):
     is_admin: bool = False
 
 
+class StoreIn(BaseModel):
+    name: str
+    street: str
+    postcode: str
+    city: str
+    contact_person: Optional[str] = None
+    phone_number: Optional[str] = None
+
+
+class StoreOut(BaseModel):
+    id: int
+    name: str
+    street: str
+    postcode: str
+    city: str
+    contact_person: Optional[str]
+    phone_number: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+class ScheduleCreateRequest(BaseModel):
+    date: date
+    store_id: int
+
+
 class SlotOut(BaseModel):
     id: int
     start_time: str
@@ -130,10 +172,25 @@ class SlotOut(BaseModel):
 class ScheduleOut(BaseModel):
     id: int
     date: date
+    store: Optional[StoreOut]
     slots: List[SlotOut]
 
     class Config:
         from_attributes = True
+
+
+class SlotUpdateRequest(BaseModel):
+    start_time: str
+    end_time: str
+    required_count: int
+    label: str
+
+
+class SlotCreateRequest(BaseModel):
+    start_time: str
+    end_time: str
+    required_count: int
+    label: str
 
 
 # --- Helpers ---
@@ -191,22 +248,6 @@ def seed_admin(db: Session):
         db.commit()
 
 
-def seed_schedules(db: Session):
-    if db.query(Schedule).count() == 0:
-        today = date.today()
-        days_ahead = (5 - today.weekday()) % 7 or 7
-        next_saturday = today + timedelta(days=days_ahead)
-        for i in range(16):
-            db.add(Schedule(date=next_saturday + timedelta(weeks=i)))
-        db.commit()
-
-    for schedule in db.query(Schedule).all():
-        if not schedule.slots:
-            for tmpl in SLOT_TEMPLATES:
-                db.add(TimeSlot(schedule_id=schedule.id, **tmpl))
-    db.commit()
-
-
 # --- Startup ---
 
 @app.on_event("startup")
@@ -217,11 +258,14 @@ def startup():
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS "
             "is_admin BOOLEAN NOT NULL DEFAULT FALSE"
         ))
+        conn.execute(text(
+            "ALTER TABLE schedules ADD COLUMN IF NOT EXISTS "
+            "store_id INTEGER REFERENCES stores(id)"
+        ))
         conn.commit()
     db = SessionLocal()
     try:
         seed_admin(db)
-        seed_schedules(db)
     finally:
         db.close()
 
@@ -281,7 +325,8 @@ def list_schedules(current_user: User = Depends(get_current_user), db: Session =
                 volunteer_ids=[su.user_id for su in slot.signups],
                 full=len(slot.signups) >= slot.required_count and not signed_up,
             ))
-        result.append(ScheduleOut(id=s.id, date=s.date, slots=slots))
+        store_out = StoreOut.model_validate(s.store) if s.store else None
+        result.append(ScheduleOut(id=s.id, date=s.date, store=store_out, slots=slots))
     return result
 
 
@@ -390,3 +435,131 @@ def admin_slot_remove(slot_id: int, user_id: int, admin: User = Depends(get_admi
     db.delete(su)
     db.commit()
     return {"message": "Removed user from slot"}
+
+
+# --- Admin: Stores ---
+
+@app.get("/api/admin/stores", response_model=List[StoreOut])
+def admin_list_stores(admin: User = Depends(get_admin_user), db: Session = Depends(get_db)):
+    return db.query(Store).order_by(Store.name).all()
+
+
+@app.post("/api/admin/stores", response_model=StoreOut, status_code=201)
+def admin_create_store(data: StoreIn, admin: User = Depends(get_admin_user),
+                       db: Session = Depends(get_db)):
+    store = Store(**data.model_dump())
+    db.add(store)
+    db.commit()
+    db.refresh(store)
+    return store
+
+
+@app.put("/api/admin/stores/{store_id}", response_model=StoreOut)
+def admin_update_store(store_id: int, data: StoreIn, admin: User = Depends(get_admin_user),
+                       db: Session = Depends(get_db)):
+    store = db.query(Store).filter(Store.id == store_id).first()
+    if not store:
+        raise HTTPException(status_code=404, detail="Store not found")
+    for k, v in data.model_dump().items():
+        setattr(store, k, v)
+    db.commit()
+    db.refresh(store)
+    return store
+
+
+@app.delete("/api/admin/stores/{store_id}", status_code=204)
+def admin_delete_store(store_id: int, admin: User = Depends(get_admin_user),
+                       db: Session = Depends(get_db)):
+    store = db.query(Store).filter(Store.id == store_id).first()
+    if not store:
+        raise HTTPException(status_code=404, detail="Store not found")
+    if store.schedules:
+        raise HTTPException(status_code=400,
+                            detail="Kan winkel niet verwijderen: er zijn gekoppelde datums")
+    db.delete(store)
+    db.commit()
+
+
+# --- Admin: Schedules ---
+
+@app.get("/api/admin/schedules", response_model=List[ScheduleOut])
+def admin_list_schedules(admin: User = Depends(get_admin_user), db: Session = Depends(get_db)):
+    schedules = db.query(Schedule).order_by(Schedule.date).all()
+    result = []
+    for s in schedules:
+        slots = [SlotOut(
+            id=slot.id, start_time=slot.start_time, end_time=slot.end_time,
+            label=slot.label, required_count=slot.required_count,
+            signup_count=len(slot.signups), signed_up=False,
+            volunteers=[su.user.name for su in slot.signups],
+            volunteer_ids=[su.user_id for su in slot.signups],
+            full=False,
+        ) for slot in s.slots]
+        store_out = StoreOut.model_validate(s.store) if s.store else None
+        result.append(ScheduleOut(id=s.id, date=s.date, store=store_out, slots=slots))
+    return result
+
+
+@app.post("/api/admin/schedules", status_code=201)
+def admin_create_schedule(data: ScheduleCreateRequest, admin: User = Depends(get_admin_user),
+                          db: Session = Depends(get_db)):
+    if not db.query(Store).filter(Store.id == data.store_id).first():
+        raise HTTPException(status_code=404, detail="Store not found")
+    if db.query(Schedule).filter(Schedule.date == data.date).first():
+        raise HTTPException(status_code=400, detail="Er bestaat al een datum voor deze dag")
+    schedule = Schedule(date=data.date, store_id=data.store_id)
+    db.add(schedule)
+    db.flush()
+    for tmpl in DEFAULT_SLOTS:
+        db.add(TimeSlot(schedule_id=schedule.id, **tmpl))
+    db.commit()
+    db.refresh(schedule)
+    return {"id": schedule.id, "date": str(schedule.date)}
+
+
+@app.delete("/api/admin/schedules/{schedule_id}", status_code=204)
+def admin_delete_schedule(schedule_id: int, admin: User = Depends(get_admin_user),
+                          db: Session = Depends(get_db)):
+    schedule = db.query(Schedule).filter(Schedule.id == schedule_id).first()
+    if not schedule:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    db.delete(schedule)
+    db.commit()
+
+
+# --- Admin: Slot CRUD ---
+
+@app.put("/api/admin/slots/{slot_id}")
+def admin_update_slot(slot_id: int, data: SlotUpdateRequest,
+                      admin: User = Depends(get_admin_user), db: Session = Depends(get_db)):
+    slot = db.query(TimeSlot).filter(TimeSlot.id == slot_id).first()
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    slot.start_time = data.start_time
+    slot.end_time = data.end_time
+    slot.required_count = data.required_count
+    slot.label = data.label
+    db.commit()
+    return {"message": "Slot updated"}
+
+
+@app.post("/api/admin/schedules/{schedule_id}/slots", status_code=201)
+def admin_create_slot(schedule_id: int, data: SlotCreateRequest,
+                      admin: User = Depends(get_admin_user), db: Session = Depends(get_db)):
+    if not db.query(Schedule).filter(Schedule.id == schedule_id).first():
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    slot = TimeSlot(schedule_id=schedule_id, **data.model_dump())
+    db.add(slot)
+    db.commit()
+    db.refresh(slot)
+    return {"id": slot.id}
+
+
+@app.delete("/api/admin/slots/{slot_id}", status_code=204)
+def admin_delete_slot(slot_id: int, admin: User = Depends(get_admin_user),
+                      db: Session = Depends(get_db)):
+    slot = db.query(TimeSlot).filter(TimeSlot.id == slot_id).first()
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot not found")
+    db.delete(slot)
+    db.commit()
