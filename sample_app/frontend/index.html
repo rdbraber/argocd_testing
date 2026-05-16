@@ -150,16 +150,23 @@
           const d = new Date(s.date + 'T00:00:00');
           const label = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
           const signed = s.signed_up;
+          const names = s.volunteers.length
+            ? s.volunteers.join(', ')
+            : '<em style="color:#a0aec0">No one signed up yet</em>';
           return `<div class="schedule-item ${signed ? 'signed-up' : ''}">
-            <div>
+            <div style="flex:1">
               <div class="schedule-date">${label}</div>
-              <div class="schedule-meta">${s.signup_count} volunteer${s.signup_count !== 1 ? 's' : ''} signed up
+              <div class="schedule-meta">
+                ${s.signup_count} volunteer${s.signup_count !== 1 ? 's' : ''}
                 ${signed ? '<span class="badge badge-green" style="margin-left:0.5rem">You\'re in!</span>' : ''}
               </div>
+              <div style="font-size:0.82rem;color:#4a5568;margin-top:0.35rem">${names}</div>
             </div>
-            ${signed
-              ? `<button class="btn btn-sm btn-cancel" onclick="doCancel(${s.id})">Cancel</button>`
-              : `<button class="btn btn-sm btn-signup" onclick="doSignup(${s.id})">Sign up</button>`}
+            <div style="margin-left:1rem;flex-shrink:0">
+              ${signed
+                ? `<button class="btn btn-sm btn-cancel" onclick="doCancel(${s.id})">Sign off</button>`
+                : `<button class="btn btn-sm btn-signup" onclick="doSignup(${s.id})">Sign up</button>`}
+            </div>
           </div>`;
         }).join('');
       } catch (e) {

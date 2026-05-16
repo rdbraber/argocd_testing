@@ -72,6 +72,7 @@ class ScheduleOut(BaseModel):
     date: date
     signup_count: int
     signed_up: bool
+    volunteers: List[str]
 
     class Config:
         from_attributes = True
@@ -179,7 +180,8 @@ def list_schedules(current_user: User = Depends(get_current_user), db: Session =
     for s in schedules:
         signed_up = any(su.user_id == current_user.id for su in s.signups)
         result.append(ScheduleOut(id=s.id, date=s.date,
-                                  signup_count=len(s.signups), signed_up=signed_up))
+                                  signup_count=len(s.signups), signed_up=signed_up,
+                                  volunteers=[su.user.name for su in s.signups]))
     return result
 
 
