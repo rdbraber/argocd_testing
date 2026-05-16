@@ -27,27 +27,32 @@ spec:
           REGISTRY="192.168.123.248:5000"
           CERT_DIR="/host-certs/${REGISTRY}"
           HOSTS_TOML="${CERT_DIR}/hosts.toml"
+          CONFIG_TOML="/host-config/config.toml"
 
+          # Fix config_path — containerd 2.x treats the value as a single string,
+          # so the colon-separated value '/etc/containerd/certs.d:/etc/docker/certs.d'
+          # resolves to a non-existent directory. Set it to a single valid path.
+          sed -i "s|config_path = '/etc/containerd/certs.d:/etc/docker/certs.d'|config_path = '/etc/containerd/certs.d'|g" "${CONFIG_TOML}"
+
+          # Write the per-registry hosts.toml
           mkdir -p "${CERT_DIR}"
+          cat > "${HOSTS_TOML}" << EOF
+          server = "http://${REGISTRY}"
 
-          NEW_CONTENT="server = \"http://${REGISTRY}\"
+          [host."http://${REGISTRY}"]
+            capabilities = ["pull", "resolve", "push"]
+            skip_verify = true
+          EOF
 
-          [host.\"http://${REGISTRY}\"]
-            capabilities = [\"pull\", \"resolve\", \"push\"]
-            skip_verify = true"
-
-          if [ "$(cat ${HOSTS_TOML} 2>/dev/null)" = "${NEW_CONTENT}" ]; then
-            echo "Registry already configured on $(hostname), skipping restart"
-            exit 0
-          fi
-
-          echo "${NEW_CONTENT}" > "${HOSTS_TOML}"
-          echo "Wrote ${HOSTS_TOML} on $(hostname)"
+          echo "Configured registry on $(hostname), restarting containerd..."
           nsenter -t 1 -m -u -i -n -- systemctl restart containerd
-          echo "Restarted containerd on $(hostname)"
+          sleep 5
+          echo "Done on $(hostname)"
         volumeMounts:
         - name: containerd-certs
           mountPath: /host-certs
+        - name: containerd-config
+          mountPath: /host-config
       containers:
       - name: pause
         image: busybox:1.36
@@ -57,3 +62,7 @@ spec:
         hostPath:
           path: /etc/containerd/certs.d
           type: DirectoryOrCreate
+      - name: containerd-config
+        hostPath:
+          path: /etc/containerd
+          type: Directory
