@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-kubernetes
+  namespace: default
+  labels:
+    app: hello-kubernetes
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: hello-kubernetes
+  template:
+    metadata:
+      labels:
+        app: hello-kubernetes
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: paulbouwer/hello-kubernetes:1.10
+        env:
+        - name: MESSAGE
+          value: "application A"
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-kubernetes
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: hello-kubernetes
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hello-kubernetes
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.123.245`) && PathPrefix(`/hello-kubernetes`)
+      kind: Rule
+      services:
+        - name: hello-kubernetes
+          port: 80
+      middlewares:
+        - name: hello-kubernetes-strip-prefix
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: hello-kubernetes-strip-prefix
+  namespace: default
+spec:
+  stripPrefix:
+    prefixes:
+      - /hello-kubernetes
