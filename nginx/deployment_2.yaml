@@ -54,6 +54,11 @@ spec:
           port: 80
       middlewares:
         - name: hello-kubernetes-strip-prefix
+    - match: Host(`192.168.123.245`) && PathPrefix(`/_next`)
+      kind: Rule
+      services:
+        - name: hello-kubernetes
+          port: 80
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
