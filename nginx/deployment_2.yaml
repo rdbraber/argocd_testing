@@ -22,7 +22,7 @@ spec:
         - name: MESSAGE
           value: "application A"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
@@ -35,7 +35,7 @@ spec:
     app: hello-kubernetes
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 8080
     protocol: TCP
 ---
 apiVersion: traefik.io/v1alpha1
