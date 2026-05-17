@@ -27,10 +27,37 @@ metadata:
   name: nginx
   namespace: default
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: nginx
   ports:
   - port: 80
     targetPort: 80
     protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`192.168.123.245`) && PathPrefix(`/nginx`)
+      kind: Rule
+      services:
+        - name: nginx
+          port: 80
+      middlewares:
+        - name: nginx-strip-prefix
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: nginx-strip-prefix
+  namespace: default
+spec:
+  stripPrefix:
+    prefixes:
+      - /nginx
