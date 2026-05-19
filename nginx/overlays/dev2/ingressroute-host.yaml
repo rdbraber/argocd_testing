@@ -1,0 +1,7 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hello-kubernetes
+spec:
+  routes:
+    - match: Host(`hello-kubernetes.dev2.192.168.123.125.nip.io`)
