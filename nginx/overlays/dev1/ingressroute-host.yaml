@@ -5,3 +5,7 @@ metadata:
 spec:
   routes:
     - match: Host(`hello-kubernetes.dev1.192.168.123.125.nip.io`)
+      kind: Rule
+      services:
+        - name: hello-kubernetes-weighted
+          kind: TraefikService
