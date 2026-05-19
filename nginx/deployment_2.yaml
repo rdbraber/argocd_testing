@@ -5,18 +5,16 @@ metadata:
   namespace: default
   labels:
     app: hello-kubernetes
-    variant: application-a
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: hello-kubernetes
-      variant: application-a
   template:
     metadata:
       labels:
         app: hello-kubernetes
-        variant: application-a
+        service: hello-kubernetes
     spec:
       containers:
       - name: hello-kubernetes
@@ -33,19 +31,17 @@ metadata:
   name: hello-kubernetes-b
   namespace: default
   labels:
-    app: hello-kubernetes
-    variant: application-b
+    app: hello-kubernetes-b
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-kubernetes
-      variant: application-b
+      app: hello-kubernetes-b
   template:
     metadata:
       labels:
-        app: hello-kubernetes
-        variant: application-b
+        app: hello-kubernetes-b
+        service: hello-kubernetes
     spec:
       containers:
       - name: hello-kubernetes
@@ -64,7 +60,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: hello-kubernetes
+    service: hello-kubernetes
   ports:
   - port: 80
     targetPort: 8080
