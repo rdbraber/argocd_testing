@@ -21,7 +21,7 @@ spec:
         image: paulbouwer/hello-kubernetes:1.10
         env:
         - name: MESSAGE
-          value: "application A"
+          value: "application v1.0"
         ports:
         - containerPort: 8080
 ---
@@ -48,7 +48,7 @@ spec:
         image: paulbouwer/hello-kubernetes:1.10
         env:
         - name: MESSAGE
-          value: "application B"
+          value: "application v2.0"
         ports:
         - containerPort: 8080
 ---
