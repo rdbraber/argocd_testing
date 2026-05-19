@@ -28,19 +28,19 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello-kubernetes-b
+  name: hello-kubernetes-canary
   namespace: default
   labels:
-    app: hello-kubernetes-b
+    app: hello-kubernetes-canary
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hello-kubernetes-b
+      app: hello-kubernetes-canary
   template:
     metadata:
       labels:
-        app: hello-kubernetes-b
+        app: hello-kubernetes-canary
         service: hello-kubernetes
     spec:
       containers:
