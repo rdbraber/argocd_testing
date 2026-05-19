@@ -5,15 +5,18 @@ metadata:
   namespace: default
   labels:
     app: hello-kubernetes
+    variant: application-a
 spec:
   replicas: 6
   selector:
     matchLabels:
       app: hello-kubernetes
+      variant: application-a
   template:
     metadata:
       labels:
         app: hello-kubernetes
+        variant: application-a
     spec:
       containers:
       - name: hello-kubernetes
@@ -21,6 +24,35 @@ spec:
         env:
         - name: MESSAGE
           value: "application A"
+        ports:
+        - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-kubernetes-b
+  namespace: default
+  labels:
+    app: hello-kubernetes
+    variant: application-b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-kubernetes
+      variant: application-b
+  template:
+    metadata:
+      labels:
+        app: hello-kubernetes
+        variant: application-b
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: paulbouwer/hello-kubernetes:1.10
+        env:
+        - name: MESSAGE
+          value: "application B"
         ports:
         - containerPort: 8080
 ---
