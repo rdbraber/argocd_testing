@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: hello-kubernetes
-        service: hello-kubernetes
+        track: stable
     spec:
       containers:
       - name: hello-kubernetes
@@ -33,7 +33,7 @@ metadata:
   labels:
     app: hello-kubernetes-canary
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: hello-kubernetes-canary
@@ -41,7 +41,7 @@ spec:
     metadata:
       labels:
         app: hello-kubernetes-canary
-        service: hello-kubernetes
+        track: canary
     spec:
       containers:
       - name: hello-kubernetes
@@ -55,16 +55,45 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-kubernetes
+  name: hello-kubernetes-stable
   namespace: default
 spec:
   type: ClusterIP
   selector:
-    service: hello-kubernetes
+    track: stable
   ports:
   - port: 80
     targetPort: 8080
     protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-kubernetes-canary
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    track: canary
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+---
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: hello-kubernetes-weighted
+  namespace: default
+spec:
+  weighted:
+    services:
+    - name: hello-kubernetes-stable
+      port: 80
+      weight: 75
+    - name: hello-kubernetes-canary
+      port: 80
+      weight: 25
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -78,5 +107,5 @@ spec:
     - match: Host(`hello-kubernetes.192.168.123.125.nip.io`)
       kind: Rule
       services:
-        - name: hello-kubernetes
-          port: 80
+        - name: hello-kubernetes-weighted
+          kind: TraefikService
