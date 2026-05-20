@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hello-kubernetes
+spec:
+  routes:
+    - match: Host(`hello-kubernetes.192.168.123.157.nip.io`)
+      kind: Rule
+      services:
+        - name: hello-kubernetes-weighted
+          kind: TraefikService
