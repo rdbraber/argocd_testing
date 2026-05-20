@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello-kubernetes-dev1
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/rdbraber/argocd_testing.git
+    targetRevision: main
+    path: hello-kubernetes/applications/overlays/dev1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev1
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

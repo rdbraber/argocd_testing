@@ -11,3 +11,29 @@ patches:
       version: v1alpha1
       kind: IngressRoute
       name: hello-kubernetes
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: hello-kubernetes
+      spec:
+        template:
+          spec:
+            containers:
+            - name: hello-kubernetes
+              env:
+              - name: MESSAGE
+                value: "prd - application v1.0"
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: hello-kubernetes-canary
+      spec:
+        template:
+          spec:
+            containers:
+            - name: hello-kubernetes
+              env:
+              - name: MESSAGE
+                value: "prd - application v2.0"
